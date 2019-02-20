@@ -181,7 +181,7 @@ const url =
     _takePhoto = async () => {
     let pickerResult = await ImagePicker.launchCameraAsync({
         allowsEditing: true,
-        aspect: [4, 3],
+        aspect: [6, 6],
     });
 
     this._handleImagePicked(pickerResult);
@@ -190,54 +190,51 @@ const url =
     _pickImage = async () => {
     let pickerResult = await ImagePicker.launchImageLibraryAsync({
         allowsEditing: true,
-        aspect: [4, 3],
+        aspect: [6, 6],
     });
 
     this._handleImagePicked(pickerResult);
     };
 
     _handleImagePicked = async pickerResult => {
-    try {
-        this.setState({ uploading: true });
-
-        if (!pickerResult.cancelled) {
-        uploadUrl = await uploadImageAsync(pickerResult.uri);
-        this.setState({ image: uploadUrl });
+        try {
+            this.setState({ uploading: true });
+    
+            if (!pickerResult.cancelled) {
+            uploadUrl = await uploadImageAsync(pickerResult.uri);
+            this.setState({ image: uploadUrl });
+            }
+        } catch (e) {
+            console.log(e);
+            alert('Upload failed, sorry :(');
+        } finally {
+            this.setState({ uploading: false });
         }
-    } catch (e) {
-        console.log(e);
-        alert('Upload failed, sorry :(');
-    } finally {
-        this.setState({ uploading: false });
-    }
     };
- }
-
+}
 async function uploadImageAsync(uri) {
-  const blob = await new Promise((resolve, reject) => {
+    const blob = await new Promise((resolve, reject) => {
     const xhr = new XMLHttpRequest();
     xhr.onload = function() {
-      resolve(xhr.response);
+    resolve(xhr.response);
     };
     xhr.onerror = function(e) {
-      console.log(e);
-      reject(new TypeError('Network request failed'));
+    console.log(e);
+    reject(new TypeError('Network request failed'));
     };
     xhr.responseType = 'blob';
     xhr.open('GET', uri, true);
     xhr.send(null);
-  });
-  const { currentUser } = firebase.auth();
-  const ref = firebase
+    });
+    const { currentUser } = firebase.auth();
+    const ref = firebase
     .storage()
     .ref(currentUser.uid)
     .child(currentUser.uid);
-  const snapshot = await ref.put( );
+    const snapshot = await ref.put(blob);
+    blob.close();
 
-  // We're done with the blob, close and release it
-  blob.close();
-
-  return await snapshot.ref.getDownloadURL();
+    return await snapshot.ref.getDownloadURL();
 }
  const styles = StyleSheet.create({
     backgroundContainer: {
