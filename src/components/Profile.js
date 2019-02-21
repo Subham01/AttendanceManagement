@@ -7,14 +7,20 @@ import {
     TouchableOpacity } from 'react-native';
 import * as firebase from 'firebase';
 import { Actions } from 'react-native-router-flux';
+import Loader from './Loader';
 
 const { width: WIDTH } = Dimensions.get('window');
 
 class Profile extends Component{
     state = {
-        name: '',
+        firstname: '',
+        lastname: '',
+        contact: '',
         uroll: '',
-        image: ''
+        semester: '',
+        loading: true,
+        stream: '',
+        image: '',
     };
     componentDidMount() {
         const { currentUser } = firebase.auth();
@@ -25,28 +31,70 @@ class Profile extends Component{
          .once('value', snap => 
             this.setState({
                 uroll: snap.val().uroll,
-                name: snap.val().name,
-                image: snap.val().image
+                firstname: snap.val().firstname,
+                image: snap.val().image,
+                lastname: snap.val().lastname,
+                contact: snap.val().contact,
+                semester: snap.val().semester,
+                stream: snap.val().stream,
+                loading: false
             })
          );
     }
     signOut() {
         firebase.auth().signOut();
+        Actions.auth();
         Actions.login();
     }
     render(){
+        const { firstname, lastname, contact, uroll, semester, stream, image } = this.state;
         return(
             <View style={styles.backgroundContainer}>
-               <Text>
-                   {this.state.name}
-               </Text>
-               <Text>
-                   {this.state.uroll}
-               </Text>
-               <View>
-               <Image style={{height:90, width: 90}}source={{uri: this.state.image}} />
-               </View>
-               <TouchableOpacity style={styles.btnLogin}
+                <Loader loading={this.state.loading} />
+                <View>
+                    <Image style={{height:150, width: 150, borderRadius: 75}} source={{uri: this.state.image}} />
+                </View>
+                <View style={styles.displayContent}>
+                    <Text style={styles.titleContent}>
+                        Name :  
+                    </Text>
+                    <Text style={styles.valueContent}>
+                        {firstname.concat(' ').concat(lastname)}
+                    </Text>
+                </View>
+                <View style={styles.displayContent}>
+                    <Text style={styles.titleContent}>
+                        University Roll No :  
+                    </Text>
+                    <Text style={styles.valueContent}>
+                        {uroll}
+                    </Text>
+                </View>
+                <View style={styles.displayContent}>
+                    <Text style={styles.titleContent}>
+                        Contact :  
+                    </Text>
+                    <Text style={styles.valueContent}>
+                        {contact}
+                    </Text>
+                </View>
+                <View style={styles.displayContent}>
+                    <Text style={styles.titleContent}>
+                        Department :  
+                    </Text>
+                    <Text style={styles.valueContent}>
+                        {stream}
+                    </Text>
+                </View>
+                <View style={styles.displayContent}>
+                    <Text style={styles.titleContent}>
+                        Semester :  
+                    </Text>
+                    <Text style={styles.valueContent}>
+                        {semester}
+                    </Text>
+                </View>
+                <TouchableOpacity style={styles.btnLogin}
                    onPress={() => Actions.attendance()}>
                    <Text style={styles.text}>Attendance</Text>     
                 </TouchableOpacity>
@@ -74,8 +122,39 @@ styles= {
     },
     backgroundContainer: {
         flex: 1,
-        justifyContent: 'center',
+        paddingTop: 40,
         alignItems: 'center'
      },
+     logoText: {
+        color: 'black',
+        fontSize: 20,
+        fontWeight: '500',
+        marginTop: 10,
+        opacity: 0.5,
+        alignItems: 'center'
+    },
+    displayContent: {
+        paddingLeft: 16,
+        paddingBottom: 16, 
+        flexDirection: 'row',
+    },
+    titleContent: {
+        color: 'black',
+        flex: 1,
+        fontSize: 20,
+        fontWeight: '200',
+        marginTop: 10,
+        opacity: 0.5,
+        alignItems: 'center'
+    },
+    valueContent: {
+        color: 'black',
+        flex: 1,
+        fontSize: 15,
+        fontWeight: '200',
+        marginTop: 10,
+        opacity: 0.5,
+        alignItems: 'center'
+    }
 };
 export default Profile;

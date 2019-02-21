@@ -2,8 +2,10 @@ import React, {Component} from 'react';
 import firebase from '@firebase/app';
 require('firebase/auth');
 import Router from './src/Router';
-export default class App extends Component {
+import Profile from './src/components/Profile';
+import Loader from './src/components/Loader';
 
+export default class App extends Component {
   componentWillMount() {
     const config = {
       apiKey: "AIzaSyD6kJDDnPPCoj6AKpIXwRnGDJ0pfWsnxiU",
@@ -14,7 +16,16 @@ export default class App extends Component {
       messagingSenderId: "680452651401"
     };
     firebase.initializeApp(config);
+    // firebase.auth().onAuthStateChanged((user) => {
+    //   if (user) {
+    //     this.setState({ loggedIn: true });
+    //   } 
+    //   else {
+    //     this.setState({ loggedIn: false });
+    //   }
+    // });
   }
+  
   render() {
     return (
       <Router />

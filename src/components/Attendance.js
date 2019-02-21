@@ -13,12 +13,19 @@ import {
 } from 'react-native';
 import { Constants, ImagePicker, Permissions } from 'expo';
 import * as firebase from 'firebase';
+import Loader from './Loader';
+import successgif from '../Images/success.gif';
 
 const api_url = 'http://106.51.58.118:5000/compare_faces?face_det=1';
+const { width: WIDTH } = Dimensions.get('window');
+
 class Attendance extends Component {
     state = {
         image: null,
-        face: null
+        submit: false,
+        loading: false,
+        face: null,
+        confidence: 0
     };
     async componentDidMount() {
         await Permissions.askAsync(Permissions.CAMERA);
@@ -52,13 +59,13 @@ class Attendance extends Component {
         .then(response => {
         return response.json()
         .then(responseJson => {
-            //You put some checks here
             return responseJson;
         });
     });
 }
     submitAttendance = async () => {
         const { image, face } = this.state;
+        this.setState({ loading: true });
         this.upload(api_url,{
             'img_1': {
                 name: 'img_1',
@@ -71,131 +78,58 @@ class Attendance extends Component {
                 uri: face
             }
         }).then(r => {
-            console.log(r);
+            this.setState({ submit: true, loading: false, confidence: r.confidence});
         });
-        // const data = {
-        //     'img_1': face,
-        //     'img_2': image
-        // }
-        // data.append('img_1', {
-        //     name: 'img_1',
-        //     type: 'image/jpg',
-        //     uri: image
-        // });
-        // data.append('img_2', {
-        //     name: 'img_2',
-        //     type: 'image/jpg',
-        //     uri: face
-        // });
-        // const data = new FormData()
-        // data.append('img_1', {
-        //     uri: image,
-        //     type: 'image/jpg',
-        //     name: 'img_1.jpg'
-        // });
-        // data.append('img_2', {
-        //     uri: face,
-        //     type: 'image/jpg',
-        //     name: 'img_2.jpg'
-        // });
-        // RNFetchBlob.fetch('POST', api_url, {
-        //     Authorization : "Bearer access-token",
-        //     otherHeader : "foo",
-        //     'Content-Type' : 'multipart/form-data',
-        //     'user_id': 'e5b0be890da6cf78a09b',
-        //     'user_key': 'aa93ecaf267451c1119e',
-        // }, [
-        // // element with property `filename` will be transformed into `file` in form data
-        // { name : 'img_1', filename : image, type:'image/png', data: binaryDataInBase64},
-        // // custom content type
-        // { name : 'img_2', filename : face, type:'image/png', data: binaryDataInBase64},
-        // // part file from storage
-        // ]).then((resp) => {
-        //     console.log('Data Stored');
-        // }).catch((err) => {
-        //     console.log('Error Occoured');
-        // })
-        // const api_body = {
-        //     'img_1': image,
-        //     'img_2': face,
-        // };
-        // try{
-        //     let response = await fetch(api_url, {
-        //         method: 'POST',
-        //         headers: {
-        //             'Content-Type': 'multipart/form-data',
-        //             //'Accept': 'application/json',multipart/form-data; boundary=----WebKitFormBoundary7MA4YWxkTrZu0gW
-        //             'user_id': 'e5b0be890da6cf78a09b',
-        //             'user_key': 'aa93ecaf267451c1119e',
-        //         },
-        //         body: data//JSON.stringify(data)
-        //     });
-        //     console.log(data);
-        //     console.log(response);
-        //     responseJson = await response.json();
-        //     console.log(responseJson);
-        // } catch (error) {
-        //     alert(error);
-        // }
-        // var http = require('http');
-
-        // var options = {
-        //     'method': 'POST',
-        //     'hostname': '106.51.58.118',
-        //     'path': '/compare_faces?face_det=1',
-        //     'headers': {
-        //         'Content-Type': 'multipart/form-data;boundary=----WebKitFormBoundary7MA4YWxkTrZu0gW',
-        //         'user_id': 'e5b0be890da6cf78a09b',
-        //         'user_key': 'aa93ecaf267451c1119e'
-        //     }
-        // };
-
-        // var req = fetch (options, function (res) {
-        // var chunks = [];
-
-        // res.on("data", function (chunk) {
-        //     chunks.push(chunk);
-        // });
-
-        // res.on("end", function (chunk) {
-        //     var body = Buffer.concat(chunks);
-        //     console.log(body.toString());
-        // });
-
-        // res.on("error", function (error) {
-        //     console.error('error');
-        // });
-        // });
-
-        // var postData = `------WebKitFormBoundary7MA4YWxkTrZu0gW\r\nContent-Disposition: form-data; name=\"img_1\"\r\n\r\n${image}\r\n------WebKitFormBoundary7MA4YWxkTrZu0gW\r\nContent-Disposition: form-data; name=\"img_2\"\r\n\r\n${face}\r\n------WebKitFormBoundary7MA4YWxkTrZu0gW--`;
-
-        // //req.setHeader('content-type', 'multipart/form-data; boundary=----WebKitFormBoundary7MA4YWxkTrZu0gW');
-
-        // req.write(postData);
-
-        // req.end();
     }
     render(){
         return(
             <View style={styles.Conatiner}>
-                {this.state.image ? null : (
-                <Text style={styles.textContainer}>
-                    Take Image
-                </Text>
-                )}
-    
-                {this.renderButtons()}
-                {this._maybeRenderImage()}
-                <StatusBar barStyle="default" />
-                <Button onPress={this.submitAttendance.bind(this)} title="Submit Attendance" />
+                <Loader loading={this.state.loading} />
+                {this.renderContent()}
             </View>
+        );
+    }
+    renderContent() {
+        if(this.state.submit == false) {
+            return(
+                <View>
+                    {this.renderButtons()}
+                    {this._maybeRenderImage()}
+                    {this.submitButtons()}
+                </View>
+            );
+        }
+        else {
+            return(
+                <View style = {{backgroundColor: '#FFFFFF'}}>
+                    <Image source={successgif} style={styles.logo} />
+                    {this.identified()}
+                </View>
+            );
+        }
+    }
+    identified() {
+        if(this.state.confidence > 0.70) {
+            return(<Text>Identified! Confidence: {this.state.confidence}</Text>);
+        }
+        else {
+            return(<Text>Couldn't recognize you</Text>);
+        }
+    }
+    submitButtons() {
+        return(
+            <TouchableOpacity style={styles.btnLogin}
+                onPress={this.submitAttendance.bind(this)}>
+                <Text style={styles.text}>Submit Attendance</Text>     
+            </TouchableOpacity>
         );
     }
     renderButtons() {
         return(
-            <View>
-                <Button onPress={this._takePhoto} title="Take a photo" />
-            </View>
+            <TouchableOpacity style={styles.btnLogin}
+                onPress={this._takePhoto}>
+                <Text style={styles.text}>Take a photo</Text>     
+            </TouchableOpacity>
         );
     }
     _maybeRenderImage = () => {
@@ -206,7 +140,7 @@ class Attendance extends Component {
 
         return (
             <View>
-                <Image source={{uri: image}} style={{width:90, height: 90}} />
+                <Image source={{uri: image}} style={{width:140, height: 140, paddingLeft: 200}} />
             </View>
         );
     };
@@ -219,17 +153,17 @@ class Attendance extends Component {
     }
     _handleImagePicked = async pickerResult => {
         try {
-            this.setState({ uploading: true });
+            this.setState({ loading: true });
     
             if (!pickerResult.cancelled) {
             uploadUrl = await uploadImageAsync(pickerResult.uri);
-            this.setState({ image: uploadUrl });
+            this.setState({ image: uploadUrl});
             }
         } catch (e) {
             console.log(e);
             alert('Upload failed, sorry :(');
         } finally {
-            this.setState({ uploading: false });
+            this.setState({ loading: false });
         }
     };
 }
@@ -262,12 +196,31 @@ const styles = {
         alignItems: 'center',
         justifyContent: 'center'
     },
+    logo: {
+        width: 120,
+        height: 120,
+        justifyContent: 'center',
+        alignItems: 'center'
+    },
     textContainer: {
         fontSize: 20,
         marginBottom: 20,
         textAlign: 'center',
         marginHorizontal: 15,
-    }
+    },
+    btnLogin: {
+        width: WIDTH - 55,
+        height: 45,
+        borderRadius: 25,
+        justifyContent: 'center',
+        backgroundColor: '#432577',
+        marginTop: 20
+    },
+    text: {
+        fontSize: 16,
+        textAlign: 'center',
+        color: 'white'
+    },
 };
 
 export default Attendance;

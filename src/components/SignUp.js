@@ -3,9 +3,8 @@ import {
     StyleSheet,
     Text,
     View,
-    ActivityIndicator,
     Image,
-    ImageBackground,
+    KeyboardAvoidingView,
     Dimensions,
     TextInput,
     TouchableOpacity
@@ -15,7 +14,7 @@ require('firebase/auth');
 import { Actions } from 'react-native-router-flux';
 import Icon from 'react-native-vector-icons/Ionicons';
 import logo from '../Images/logo.png';
-import bgImage from '../Images/bgImage.png';
+import Loader from './Loader';
 
 const { width: WIDTH } = Dimensions.get('window');
 
@@ -28,7 +27,7 @@ const { width: WIDTH } = Dimensions.get('window');
         hidePassword: true
     };
     onSignUpButtonPress() {
-        //this.setState({ loading: true });
+        this.setState({ loading: true });
         const { email, password } = this.state;
         firebase.auth().createUserWithEmailAndPassword(email, password)
         .then(this.onLoginSuccess.bind(this))
@@ -36,7 +35,7 @@ const { width: WIDTH } = Dimensions.get('window');
         .catch(this.onLoginFail.bind(this));
     }
     onLoginFail() {
-        this.setState({ email: '',password: '', error: 'Authentication Failed', loading: false });
+        this.setState({ email: '',password: '', error: 'Failed', loading: false });
       }
     
     onLoginSuccess() {
@@ -48,29 +47,23 @@ const { width: WIDTH } = Dimensions.get('window');
         });
     }
     renderSignUpButton() {
-        if(this.state.loading){
-            return(
-                <ActivityIndicator size="small" />
-            );
-        }
-        else{
-            return (
-                <TouchableOpacity style={styles.btnLogin}
-                onPress={this.onSignUpButtonPress.bind(this)}>
-                   <Text style={styles.text}>Sign Up</Text>     
-                </TouchableOpacity>
-            );
-        }
+        return (
+            <TouchableOpacity style={styles.btnLogin}
+            onPress={this.onSignUpButtonPress.bind(this)}>
+               <Text style={styles.text}>Sign Up</Text>     
+            </TouchableOpacity>
+        );
     }
 
      render() {
          return(
-            <ImageBackground source={bgImage} style={styles.backgroundContainer}>
+            <KeyboardAvoidingView style={styles.backgroundContainer} behavior="height">
+                <Loader loading={this.state.loading} />
                 <View style={StyleSheet.logoContainer}>
                     <Image source={logo} style={styles.logo} />
                     <Text style={styles.logoText}>Welcome User</Text>
                 </View>
-                <View>
+                <View style={{paddingBottom:16 }}>
                     <Icon name="ios-person" size={28} 
                         style={styles.inputIcon}/>
                     <TextInput
@@ -80,7 +73,7 @@ const { width: WIDTH } = Dimensions.get('window');
                         placeholder={'user@gmail.com'}
                         />
                 </View>
-                <View>
+                <View style={{paddingBottom:16 }}>
                     <Icon name="ios-lock" size={28} 
                         style={styles.inputIcon}/>
                     <TextInput
@@ -91,7 +84,7 @@ const { width: WIDTH } = Dimensions.get('window');
                         placeholder={'password'}
                         />
                     <TouchableOpacity style={styles.showPassword}
-                        onPress={()=>this.setState({hidePassword: ~this.state.hidePassword})}>
+                        onPress={()=>this.setState({hidePassword: !this.state.hidePassword})}>
                         <Icon name={'ios-eye'} size={26} />
                     </TouchableOpacity>
                 </View>
@@ -99,7 +92,7 @@ const { width: WIDTH } = Dimensions.get('window');
                     {this.state.error}
                 </Text>
                 {this.renderSignUpButton()}
-            </ImageBackground>
+            </KeyboardAvoidingView>
          );
      }
  }
@@ -107,7 +100,8 @@ const { width: WIDTH } = Dimensions.get('window');
  const styles = StyleSheet.create({
     backgroundContainer: {
         flex: 1,
-        justifyContent: 'center',
+        paddingTop: 30,
+        //justifyContent: 'center',
         alignItems: 'center'
      },
     logoContainer: {
@@ -121,6 +115,7 @@ const { width: WIDTH } = Dimensions.get('window');
         color: 'black',
         fontSize: 20,
         fontWeight: '500',
+        paddingBottom: 10,
         marginTop: 10,
         opacity: 0.5,
         alignItems: 'center'
@@ -129,6 +124,7 @@ const { width: WIDTH } = Dimensions.get('window');
         width: WIDTH - 55,
         height: 45,
         borderRadius: 25,
+        borderWidth: 0.5,
         fontSize: 16,
         paddingLeft: 45,
         marginHorizontal: 25

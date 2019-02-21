@@ -3,7 +3,6 @@ import {
     StyleSheet,
     Text,
     View,
-    ActivityIndicator,
     Image,
     ImageBackground,
     Dimensions,
@@ -16,6 +15,7 @@ import { Actions } from 'react-native-router-flux';
 import Icon from 'react-native-vector-icons/Ionicons';
 import logo from '../Images/logo.png';
 import bgImage from '../Images/bgImage.png';
+import Loader from './Loader';
 
 const { width: WIDTH } = Dimensions.get('window');
 
@@ -25,15 +25,16 @@ const { width: WIDTH } = Dimensions.get('window');
         password: '',
         error: '',
         loading: false,
-        hidePassword: true
+        hidePassword: true,
+        loading: false
     };
 
     onLoginButtonPress() {
-        //this.setState({ loading: true });
+        this.setState({ loading: true });
         const { email, password } = this.state;
         firebase.auth().signInWithEmailAndPassword(email, password)
         .then(this.onLoginSuccess.bind(this))
-        .then(() => Actions.profile())
+        .then(() => Actions.main(),() => Actions.profile())
         .catch(this.onLoginFail.bind(this));
     }
     onLoginFail() {
@@ -49,39 +50,26 @@ const { width: WIDTH } = Dimensions.get('window');
         });
     }
     renderButton() {
-        if(this.state.loading){
-            return(
-                <ActivityIndicator size="small" />
-            );
-        }
-        else{
-            return (
-                <TouchableOpacity style={styles.btnLogin}
+        return(
+            <TouchableOpacity style={styles.btnLogin}
                 onPress={this.onLoginButtonPress.bind(this)}>
-                   <Text style={styles.text}>Sign In</Text>     
-                </TouchableOpacity>
-            );
-        }
+                <Text style={styles.text}>Sign In</Text>     
+            </TouchableOpacity>
+        );
     }
     renderSignUpButton() {
-        if(this.state.loading){
-            return(
-                <ActivityIndicator size="small" />
-            );
-        }
-        else{
-            return (
-                <TouchableOpacity style={styles.btnLogin}
-                onPress={() => Actions.signUp()}>
-                   <Text style={styles.text}>Sign Up</Text>     
-                </TouchableOpacity>
-            );
-        }
+        return (
+            <TouchableOpacity style={styles.btnLogin}
+            onPress={() => Actions.signUp()}>
+               <Text style={styles.text}>Sign Up</Text>     
+            </TouchableOpacity>
+        );  
     }
 
      render() {
          return(
             <ImageBackground source={bgImage} style={styles.backgroundContainer}>
+                <Loader loading={this.state.loading} />
                 <View style={StyleSheet.logoContainer}>
                     <Image source={logo} style={styles.logo} />
                     <Text style={styles.logoText}>Welcome User</Text>
@@ -94,6 +82,7 @@ const { width: WIDTH } = Dimensions.get('window');
                         onChangeText={email => this.setState({ email })}
                         style={styles.userInput}
                         placeholder={'user@gmail.com'}
+                        placeholderTextColor="#000" 
                         />
                 </View>
                 <View>
@@ -105,9 +94,10 @@ const { width: WIDTH } = Dimensions.get('window');
                         secureTextEntry={this.state.hidePassword}
                         style={styles.userInput}
                         placeholder={'password'}
+                        placeholderTextColor="#000" 
                         />
                     <TouchableOpacity style={styles.showPassword}
-                        onPress={()=>this.setState({hidePassword: ~this.state.hidePassword})}>
+                        onPress={()=>this.setState({hidePassword: !this.state.hidePassword})}>
                         <Icon name={'ios-eye'} size={26} />
                     </TouchableOpacity>
                 </View>
@@ -124,7 +114,8 @@ const { width: WIDTH } = Dimensions.get('window');
  const styles = StyleSheet.create({
     backgroundContainer: {
         flex: 1,
-        justifyContent: 'center',
+        paddingTop: 70,
+        //justifyContent: 'center',
         alignItems: 'center'
      },
     logoContainer: {
