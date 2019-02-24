@@ -140,7 +140,7 @@ class Attendance extends Component {
 
         return (
             <View>
-                <Image source={{uri: image}} style={{width:140, height: 140, paddingLeft: 200}} />
+                <Image source={{uri: image}} style={{width:140, height: 140, paddingLeft: 20+0}} />
             </View>
         );
     };

@@ -16,7 +16,6 @@ import { Constants, ImagePicker, Permissions } from 'expo';
 import * as firebase from 'firebase';
 import Icon from 'react-native-vector-icons/Ionicons';
 import Loader from './Loader';
-//import { ScrollView } from 'react-native-gesture-handler';
 
 const { width: WIDTH } = Dimensions.get('window');
 console.disableYellowBox = true;
@@ -24,40 +23,34 @@ console.disableYellowBox = true;
 const url =
   'https://firebasestorage.googleapis.com/v0/b/blobtest-36ff6.appspot.com/o/Obsidian.jar?alt=media&token=93154b97-8bd9-46e3-a51f-67be47a4628a';
 
- export default class NewUserDetail extends Component {
+ export default class LoginTeacher extends Component {
     state = {
         firstname: '',
         lastname: '',
         contact: '',
-        uroll: '',
+        teacherId: '',
         semester: '1',
         stream: 'CSE',
         error: '',
-        image: null,
         loading: false,
     };
     updateDatabase() {
-        const { firstname, lastname, contact, uroll, semester, stream, image } = this.state;
+        const { firstname, lastname, contact, teacherId, semester, stream } = this.state;
         const stream_sem = stream.concat(semester);
         const { currentUser } = firebase.auth();
-        firebase.database().ref(`/users/${currentUser.uid}`)
-        .set({ firstname, lastname, contact, uroll, semester, stream, stream_sem, image })
-        .then(()=>Actions.main(),() => Actions.profile())
+        firebase.database().ref(`/teacher/${currentUser.uid}`)
+        .set({ firstname, lastname, contact, teacherId, semester, stream, stream_sem })
+        .then(()=>Actions.teacher(),() => Actions.teacherProfile())
         .catch(this.onLoginFail.bind(this));
-    }
-    async componentDidMount() {
-        await Permissions.askAsync(Permissions.CAMERA_ROLL);
-        await Permissions.askAsync(Permissions.CAMERA);
     }
     onLoginFail() {
         this.setState({ 
             firstname: '',
             lastname: '',
             contact: '',
-            uroll: '',
+            teacherId: '',
             semester: '1',
             stream: 'CSE',
-            image: null,
             loading: false,
             error: 'Failed'
         });
@@ -145,28 +138,13 @@ const url =
                             style={styles.inputIcon}/>
                         <TextInput
                             value={this.state.uroll}
-                            onChangeText={uroll => this.setState({ uroll })}
+                            onChangeText={teacherId => this.setState({ teacherId })}
                             style={styles.userInput}
-                            placeholder={'University Roll No.'}
+                            placeholder={'Employee ID'}
                             placeholderTextColor="#000" 
                             />
                     </View>
-                    <View style={{alignItems: 'center', justifyContent: 'center' }}>
-                        {image ? null : (
-                        <Text
-                            style={{
-                            fontSize: 20,
-                            marginBottom: 20,
-                            textAlign: 'center',
-                            marginHorizontal: 15,
-                            }}>
-                            Upload Image
-                        </Text>
-                        )}
-
-                        {this.renderButtons()}
-                        {this._maybeRenderImage()}
-                        
+                    <View>
                         <Text style={styles.errorTextStyle}>
                             {this.state.error}
                         </Text>
@@ -175,102 +153,8 @@ const url =
                     </View>
                 </View>
              </ScrollView>
-         );
-     }
-    renderButtons() {
-        return(
-            <View style={{flexDirection:"row"}}>
-                <View style={{flex:1}}>
-                    <TouchableOpacity
-                        onPress={this._takePhoto}>
-                        <Icon name="ios-camera" size={35} 
-                        style={{paddingLeft: '40%',paddingRight: '40%'}}/>
-                    </TouchableOpacity>
-                </View>
-                <View style={{flex:1}}>
-                    <TouchableOpacity
-                        onPress={this._pickImage}>
-                        <Icon name="ios-image" size={35} 
-                            style={{paddingLeft: '40%',paddingRight: '40%'}}/>     
-                    </TouchableOpacity>
-                </View>
-            </View>
         );
     }
-    _maybeRenderImage = () => {
-        let { image } = this.state;
-        if (!image) {
-            return;
-        }
-        return (
-            <View style={{paddingTop: 10}}>
-                <View>
-                    <Image source={{ uri: image }} style={{ width: 140, height: 140 }} />
-                </View>
-                <Text style={{ paddingVertical: 10, paddingHorizontal: 10, color: 'green'}}>
-                    Image Upload Succesful
-                </Text>
-            </View>
-        );
-    };
-
-    _takePhoto = async () => {
-    let pickerResult = await ImagePicker.launchCameraAsync({
-        allowsEditing: true,
-        aspect: [6, 6],
-    });
-
-    this._handleImagePicked(pickerResult);
-    };
-
-    _pickImage = async () => {
-    let pickerResult = await ImagePicker.launchImageLibraryAsync({
-        allowsEditing: true,
-        aspect: [6, 6],
-    });
-
-    this._handleImagePicked(pickerResult);
-    };
-
-    _handleImagePicked = async pickerResult => {
-        try {
-            this.setState({ uploading: true, loading: true });
-    
-            if (!pickerResult.cancelled) {
-            uploadUrl = await uploadImageAsync(pickerResult.uri);
-            this.setState({ image: uploadUrl });
-            }
-        } catch (e) {
-            console.log(e);
-            alert('Upload failed, sorry :(');
-        } finally {
-            this.setState({ uploading: false, loading: false });
-        }
-    };
-}
-async function uploadImageAsync(uri) {
-    const blob = await new Promise((resolve, reject) => {
-    const xhr = new XMLHttpRequest();
-    xhr.onload = function() {
-    resolve(xhr.response);
-    };
-    xhr.onerror = function(e) {
-    console.log(e);
-    reject(new TypeError('Network request failed'));
-    };
-    xhr.responseType = 'blob';
-    xhr.open('GET', uri, true);
-    xhr.send(null);
-    });
-    const { currentUser } = firebase.auth();
-    const ref = firebase
-    .storage()
-    .ref(currentUser.uid)
-    .child(currentUser.uid);
-    const snapshot = await ref.put(blob);
-    blob.close();
-
-    return await snapshot.ref.getDownloadURL();
 }
  const styles = StyleSheet.create({
     backgroundContainer: {

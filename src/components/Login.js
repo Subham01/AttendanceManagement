@@ -19,7 +19,7 @@ import Loader from './Loader';
 
 const { width: WIDTH } = Dimensions.get('window');
 
- export default class Login extends Component {
+export default class Login extends Component {
     state = {
         email: '',
         password: '',
@@ -29,18 +29,26 @@ const { width: WIDTH } = Dimensions.get('window');
         loading: false
     };
 
-    onLoginButtonPress() {
+    onStudentLoginButtonPress() {
         this.setState({ loading: true });
         const { email, password } = this.state;
         firebase.auth().signInWithEmailAndPassword(email, password)
-        .then(this.onLoginSuccess.bind(this))
-        .then(() => Actions.main(),() => Actions.profile())
-        .catch(this.onLoginFail.bind(this));
+            .then(this.onLoginSuccess.bind(this))
+            .then(() => Actions.main(), () => Actions.studentProfile())
+            .catch(this.onLoginFail.bind(this));
+    }
+    onTeacherLoginButtonPress() {
+        this.setState({ loading: true });
+        const { email, password } = this.state;
+        firebase.auth().signInWithEmailAndPassword(email, password)
+            .then(this.onLoginSuccess.bind(this))
+            .then(Actions.teacher(),Actions.teacherProfile())
+            .catch(this.onLoginFail.bind(this));
     }
     onLoginFail() {
-        this.setState({ email: '',password: '', error: 'Authentication Failed', loading: false });
-      }
-    
+        this.setState({ email: '', password: '', error: 'Authentication Failed', loading: false });
+    }
+
     onLoginSuccess() {
         this.setState({
             email: '',
@@ -50,24 +58,34 @@ const { width: WIDTH } = Dimensions.get('window');
         });
     }
     renderButton() {
-        return(
-            <TouchableOpacity style={styles.btnLogin}
-                onPress={this.onLoginButtonPress.bind(this)}>
-                <Text style={styles.text}>Sign In</Text>     
-            </TouchableOpacity>
+        return (
+            <View style={{flexDirection: 'row'}}>
+                <View style={{paddingRight: 30}}>
+                    <TouchableOpacity style={styles.buttontnLogin}
+                        onPress={this.onStudentLoginButtonPress.bind(this)}>
+                        <Text style={styles.text}>Student</Text>
+                    </TouchableOpacity>
+                </View>
+                <View>
+                    <TouchableOpacity style={styles.buttontnLogin}
+                        onPress={this.onTeacherLoginButtonPress.bind(this)}>
+                        <Text style={styles.text}>Teacher</Text>
+                    </TouchableOpacity>
+                </View>
+            </View>
         );
     }
     renderSignUpButton() {
         return (
             <TouchableOpacity style={styles.btnLogin}
-            onPress={() => Actions.signUp()}>
-               <Text style={styles.text}>Sign Up</Text>     
+                onPress={() => Actions.signUp()}>
+                <Text style={styles.text}>Sign Up</Text>
             </TouchableOpacity>
-        );  
+        );
     }
 
-     render() {
-         return(
+    render() {
+        return (
             <ImageBackground source={bgImage} style={styles.backgroundContainer}>
                 <Loader loading={this.state.loading} />
                 <View style={StyleSheet.logoContainer}>
@@ -75,29 +93,29 @@ const { width: WIDTH } = Dimensions.get('window');
                     <Text style={styles.logoText}>Welcome User</Text>
                 </View>
                 <View>
-                    <Icon name="ios-person" size={28} 
-                        style={styles.inputIcon}/>
+                    <Icon name="ios-person" size={28}
+                        style={styles.inputIcon} />
                     <TextInput
                         value={this.state.email}
                         onChangeText={email => this.setState({ email })}
                         style={styles.userInput}
                         placeholder={'user@gmail.com'}
-                        placeholderTextColor="#000" 
-                        />
+                        placeholderTextColor="#000"
+                    />
                 </View>
                 <View>
-                    <Icon name="ios-lock" size={28} 
-                        style={styles.inputIcon}/>
+                    <Icon name="ios-lock" size={28}
+                        style={styles.inputIcon} />
                     <TextInput
                         value={this.state.password}
                         onChangeText={password => this.setState({ password })}
                         secureTextEntry={this.state.hidePassword}
                         style={styles.userInput}
                         placeholder={'password'}
-                        placeholderTextColor="#000" 
-                        />
+                        placeholderTextColor="#000"
+                    />
                     <TouchableOpacity style={styles.showPassword}
-                        onPress={()=>this.setState({hidePassword: !this.state.hidePassword})}>
+                        onPress={() => this.setState({ hidePassword: !this.state.hidePassword })}>
                         <Icon name={'ios-eye'} size={26} />
                     </TouchableOpacity>
                 </View>
@@ -107,17 +125,17 @@ const { width: WIDTH } = Dimensions.get('window');
                 {this.renderButton()}
                 {this.renderSignUpButton()}
             </ImageBackground>
-         );
-     }
- }
+        );
+    }
+}
 
- const styles = StyleSheet.create({
+const styles = StyleSheet.create({
     backgroundContainer: {
         flex: 1,
         paddingTop: 70,
         //justifyContent: 'center',
         alignItems: 'center'
-     },
+    },
     logoContainer: {
         alignItems: 'center'
     },
@@ -159,6 +177,14 @@ const { width: WIDTH } = Dimensions.get('window');
         backgroundColor: '#432577',
         marginTop: 20
     },
+    buttontnLogin: {
+        width: WIDTH / 2.5 ,
+        height: 45,
+        borderRadius: 25,
+        justifyContent: 'center',
+        backgroundColor: '#432577',
+        marginTop: 20
+    },
     text: {
         fontSize: 16,
         textAlign: 'center',
@@ -169,4 +195,4 @@ const { width: WIDTH } = Dimensions.get('window');
         alignSelf: 'center',
         color: 'red'
     }
- });
+});

@@ -18,7 +18,7 @@ import Loader from './Loader';
 
 const { width: WIDTH } = Dimensions.get('window');
 
- export default class SignUp extends Component {
+export default class SignUp extends Component {
     state = {
         email: '',
         password: '',
@@ -26,18 +26,26 @@ const { width: WIDTH } = Dimensions.get('window');
         loading: false,
         hidePassword: true
     };
-    onSignUpButtonPress() {
+    onStudentSignUp() {
         this.setState({ loading: true });
         const { email, password } = this.state;
         firebase.auth().createUserWithEmailAndPassword(email, password)
-        .then(this.onLoginSuccess.bind(this))
-        .then(() => Actions.newUser())
-        .catch(this.onLoginFail.bind(this));
+            .then(this.onLoginSuccess.bind(this))
+            .then(() => Actions.newUser())
+            .catch(this.onLoginFail.bind(this));
+    }
+    onTeacherSignUp() {
+        this.setState({ loading: true });
+        const { email, password } = this.state;
+        firebase.auth().createUserWithEmailAndPassword(email, password)
+            .then(this.onLoginSuccess.bind(this))
+            .then(() => Actions.newTeacher())
+            .catch(this.onLoginFail.bind(this));
     }
     onLoginFail() {
-        this.setState({ email: '',password: '', error: 'Failed', loading: false });
-      }
-    
+        this.setState({ email: '', password: '', error: 'Failed', loading: false });
+    }
+
     onLoginSuccess() {
         this.setState({
             email: '',
@@ -48,43 +56,53 @@ const { width: WIDTH } = Dimensions.get('window');
     }
     renderSignUpButton() {
         return (
-            <TouchableOpacity style={styles.btnLogin}
-            onPress={this.onSignUpButtonPress.bind(this)}>
-               <Text style={styles.text}>Sign Up</Text>     
-            </TouchableOpacity>
+            <View style={{flexDirection: 'row'}}>
+                <View style={{paddingRight: 30}}>
+                    <TouchableOpacity style={styles.btnLogin}
+                        onPress={this.onStudentSignUp.bind(this)}>
+                        <Text style={styles.text}>Student</Text>
+                    </TouchableOpacity>
+                </View>
+                <View>
+                    <TouchableOpacity style={styles.btnLogin}
+                        onPress={this.onTeacherSignUp.bind(this)}>
+                        <Text style={styles.text}>Teacher</Text>
+                    </TouchableOpacity>
+                </View>
+            </View>
         );
     }
 
-     render() {
-         return(
+    render() {
+        return (
             <KeyboardAvoidingView style={styles.backgroundContainer} behavior="height">
                 <Loader loading={this.state.loading} />
                 <View style={StyleSheet.logoContainer}>
                     <Image source={logo} style={styles.logo} />
                     <Text style={styles.logoText}>Welcome User</Text>
                 </View>
-                <View style={{paddingBottom:16 }}>
-                    <Icon name="ios-person" size={28} 
-                        style={styles.inputIcon}/>
+                <View style={{ paddingBottom: 16 }}>
+                    <Icon name="ios-person" size={28}
+                        style={styles.inputIcon} />
                     <TextInput
                         value={this.state.email}
                         onChangeText={email => this.setState({ email })}
                         style={styles.userInput}
                         placeholder={'user@gmail.com'}
-                        />
+                    />
                 </View>
-                <View style={{paddingBottom:16 }}>
-                    <Icon name="ios-lock" size={28} 
-                        style={styles.inputIcon}/>
+                <View style={{ paddingBottom: 16 }}>
+                    <Icon name="ios-lock" size={28}
+                        style={styles.inputIcon} />
                     <TextInput
                         value={this.state.password}
                         onChangeText={password => this.setState({ password })}
                         secureTextEntry={this.state.hidePassword}
                         style={styles.userInput}
                         placeholder={'password'}
-                        />
+                    />
                     <TouchableOpacity style={styles.showPassword}
-                        onPress={()=>this.setState({hidePassword: !this.state.hidePassword})}>
+                        onPress={() => this.setState({ hidePassword: !this.state.hidePassword })}>
                         <Icon name={'ios-eye'} size={26} />
                     </TouchableOpacity>
                 </View>
@@ -93,17 +111,17 @@ const { width: WIDTH } = Dimensions.get('window');
                 </Text>
                 {this.renderSignUpButton()}
             </KeyboardAvoidingView>
-         );
-     }
- }
+        );
+    }
+}
 
- const styles = StyleSheet.create({
+const styles = StyleSheet.create({
     backgroundContainer: {
         flex: 1,
         paddingTop: 30,
         //justifyContent: 'center',
         alignItems: 'center'
-     },
+    },
     logoContainer: {
         alignItems: 'center'
     },
@@ -140,7 +158,7 @@ const { width: WIDTH } = Dimensions.get('window');
         right: 37
     },
     btnLogin: {
-        width: WIDTH - 55,
+        width: WIDTH / 2.5 ,
         height: 45,
         borderRadius: 25,
         justifyContent: 'center',
@@ -157,4 +175,4 @@ const { width: WIDTH } = Dimensions.get('window');
         alignSelf: 'center',
         color: 'red'
     }
- });
+});
