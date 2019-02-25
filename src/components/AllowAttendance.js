@@ -1,14 +1,9 @@
 import React, { Component } from 'react';
 import {
-    StyleSheet,
     Text,
     View,
     Image,
-    Button,
-    StatusBar,
     Dimensions,
-    TextInput,
-    ActivityIndicator,
     TouchableOpacity
 } from 'react-native';
 import { Constants, ImagePicker, Permissions } from 'expo';
@@ -33,16 +28,30 @@ const { width: WIDTH } = Dimensions.get('window');
 
 class AllowAttendance extends Component {
     state = {
+        userId: '',
         image: null,
         submit: false,
         loading: false,
+        setDatabase: true,
         face: null,
         confidence: 0,
+        Error: false,
         class: '',
         flag: null,
     };
     async componentDidMount() {
         await Permissions.askAsync(Permissions.CAMERA);
+        const { currentUser } = firebase.auth();
+        firebase
+            .database()
+            .ref('users/')
+            .child(currentUser.uid)
+            .once('value', snap =>
+                this.setState({
+                    face: snap.val().image,
+                    userId: currentUser.uid
+                })
+            );
         firebase
             .database()
             .ref('attendance/')
@@ -55,32 +64,32 @@ class AllowAttendance extends Component {
             );
     }
     upload = async (requestUrl, data) => {
-    let options = {
-        headers: {
-        'Content-Type': 'multipart/form-data',
-        'user_id': 'e5b0be890da6cf78a09b',
-        'user_key': 'aa93ecaf267451c1119e',
-        },
-        method: 'POST'
-    };
-    
-    options.body = new FormData();
-    for (let key in data) {
-        options.body.append(key, data[key]);
+        let options = {
+            headers: {
+                'Content-Type': 'multipart/form-data',
+                'user_id': 'e5b0be890da6cf78a09b',
+                'user_key': 'aa93ecaf267451c1119e',
+            },
+            method: 'POST'
+        };
+
+        options.body = new FormData();
+        for (let key in data) {
+            options.body.append(key, data[key]);
+        }
+
+        return fetch(requestUrl, options)
+            .then(response => {
+                return response.json()
+                    .then(responseJson => {
+                        return responseJson;
+                    });
+            });
     }
-    
-    return fetch(requestUrl, options)
-        .then(response => {
-        return response.json()
-        .then(responseJson => {
-            return responseJson;
-        });
-    });
-}
     submitAttendance = async () => {
         const { image, face } = this.state;
         this.setState({ loading: true });
-        this.upload(api_url,{
+        this.upload(api_url, {
             'img_1': {
                 name: 'img_1',
                 type: 'image/jpg',
@@ -92,11 +101,11 @@ class AllowAttendance extends Component {
                 uri: face
             }
         }).then(r => {
-            this.setState({ submit: true, loading: false, confidence: r.confidence});
+            this.setState({ submit: true, loading: false, confidence: r.confidence });
         });
     }
-    render(){
-        return(
+    render() {
+        return (
             <View style={styles.Conatiner}>
                 <Loader loading={this.state.loading} />
                 {this.renderContent()}
@@ -104,54 +113,77 @@ class AllowAttendance extends Component {
         );
     }
     renderContent() {
-        if(this.state.flag == false){
-            return(
-                <Text>
-                    Attendance Not Allowed
-                </Text>
-            );
-        }
-        else{
-            if(this.state.submit == false) {
-                return(
-                    <View>
-                        {this.renderButtons()}
-                        {this._maybeRenderImage()}
-                        {this.submitButtons()}
-                    </View>
+        if (this.state.Error == false) {
+            if (this.state.flag == false) {
+                return (
+                    <Text>
+                        Attendance Not Allowed
+                    </Text>
                 );
             }
             else {
-                return(
-                    <View style = {{backgroundColor: '#FFFFFF'}}>
-                        <Image source={successgif} style={styles.logo} />
-                        {this.identified()}
-                    </View>
-                );
+                if (this.state.submit == false) {
+                    return (
+                        <View>
+                            {this.renderButtons()}
+                            {this._maybeRenderImage()}
+                            {this.submitButtons()}
+                        </View>
+                    );
+                }
+                else {
+                    return (
+                        <View style={{ backgroundColor: '#FFFFFF' }}>
+                            <Image source={successgif} style={styles.logo} />
+                            {this.identified()}
+                        </View>
+                    );
+                }
             }
+        }
+        else {
+            return (
+                <Text>
+                    Teacher Not Started Attendance
+                </Text>
+            );
         }
     }
     identified() {
-        if(this.state.confidence > 0.70) {
-            return(<Text>Identified! Confidence: {this.state.confidence}</Text>);
+        if (this.state.confidence > 0.70) {
+            if (this.state.setDatabase) {
+                firebase
+                    .database()
+                    .ref('attendance/')
+                    .child(this.props.class)
+                    .child(today)
+                    .push({
+                        userId: this.state.userId,
+                        image: this.state.image
+                    });
+                if(this.state.setDatabase) {
+                    this.setState({ setDatabase: false });
+                }
+            }
+            return (<Text>Identified! Confidence: {this.state.confidence}</Text>);
         }
         else {
-            return(<Text>Couldn't recognize you</Text>);
+            return (<Text>Couldn't recognize you</Text>);
         }
     }
     submitButtons() {
-        return(
+        return (
             <TouchableOpacity style={styles.btnLogin}
                 onPress={this.submitAttendance.bind(this)}>
-                <Text style={styles.text}>Submit Attendance</Text>     
+                <Text style={styles.text}>Submit Attendance</Text>
             </TouchableOpacity>
         );
     }
     renderButtons() {
-        return(
+        return (
             <TouchableOpacity style={styles.btnLogin}
                 onPress={this._takePhoto}>
-                <Text style={styles.text}>Take a photo</Text>     
+                <Text style={styles.text}>Take a photo</Text>
             </TouchableOpacity>
         );
     }
@@ -162,7 +194,7 @@ class AllowAttendance extends Component {
         }
         return (
             <View>
-                <Image source={{uri: image}} style={{width:140, height: 140, paddingLeft: 20+0}} />
+                <Image source={{ uri: image }} style={{ width: 140, height: 140, paddingLeft: 20 + 0 }} />
             </View>
         );
     };
@@ -176,10 +208,10 @@ class AllowAttendance extends Component {
     _handleImagePicked = async pickerResult => {
         try {
             this.setState({ loading: true });
-    
+
             if (!pickerResult.cancelled) {
-            uploadUrl = await uploadImageAsync(pickerResult.uri);
-            this.setState({ image: uploadUrl});
+                uploadUrl = await uploadImageAsync(pickerResult.uri);
+                this.setState({ image: uploadUrl });
             }
         } catch (e) {
             console.log(e);
@@ -191,23 +223,23 @@ class AllowAttendance extends Component {
 }
 async function uploadImageAsync(uri) {
     const blob = await new Promise((resolve, reject) => {
-    const xhr = new XMLHttpRequest();
-    xhr.onload = function() {
-    resolve(xhr.response);
-    };
-    xhr.onerror = function(e) {
-    console.log(e);
-    reject(new TypeError('Network request failed'));
-    };
-    xhr.responseType = 'blob';
-    xhr.open('GET', uri, true);
-    xhr.send(null);
+        const xhr = new XMLHttpRequest();
+        xhr.onload = function () {
+            resolve(xhr.response);
+        };
+        xhr.onerror = function (e) {
+            console.log(e);
+            reject(new TypeError('Network request failed'));
+        };
+        xhr.responseType = 'blob';
+        xhr.open('GET', uri, true);
+        xhr.send(null);
     });
     const { currentUser } = firebase.auth();
     const ref = firebase
-    .storage()
-    .ref(currentUser.uid)
-    .child(currentUser.uid.substring(1, 4));
+        .storage()
+        .ref(currentUser.uid)
+        .child(currentUser.uid.substring(1, 4));
     const snapshot = await ref.put(blob);
     blob.close();
     return await snapshot.ref.getDownloadURL();
