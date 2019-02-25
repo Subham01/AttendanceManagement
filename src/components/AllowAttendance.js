@@ -29,6 +29,8 @@ const { width: WIDTH } = Dimensions.get('window');
 class AllowAttendance extends Component {
     state = {
         userId: '',
+        firstname: '',
+        lastname: '',
         image: null,
         submit: false,
         loading: false,
@@ -49,7 +51,9 @@ class AllowAttendance extends Component {
             .once('value', snap =>
                 this.setState({
                     face: snap.val().image,
-                    userId: currentUser.uid
+                    userId: currentUser.uid,
+                    firstname: snap.val().firstname,
+                    lastname: snap.val().lastname
                 })
             );
         firebase
@@ -151,6 +155,7 @@ class AllowAttendance extends Component {
     }
     identified() {
         if (this.state.confidence > 0.70) {
+            const { firstname, lastname } = this.state;
             if (this.state.setDatabase) {
                 firebase
                     .database()
@@ -159,7 +164,8 @@ class AllowAttendance extends Component {
                     .child(today)
                     .push({
                         userId: this.state.userId,
-                        image: this.state.image
+                        image: this.state.image,
+                        name: firstname.concat(' ').concat(lastname)
                     });
                 if(this.state.setDatabase) {
                     this.setState({ setDatabase: false });

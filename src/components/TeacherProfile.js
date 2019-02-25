@@ -14,6 +14,7 @@ const { width: WIDTH } = Dimensions.get('window');
 
 class TeacherProfile extends Component {
     state = {
+        ifexists: false,
         firstname: '',
         lastname: '',
         contact: '',
@@ -56,9 +57,19 @@ class TeacherProfile extends Component {
         }
         const flag = true;
         today = mm + dd + yyyy;
-        firebase.database().ref(`/attendance/${stream_sem}/${today}`)
-        .set({ flag })
-        .then(() => Actions.attendanceList());
+        const dbRef = firebase.database().ref(`/attendance/${stream_sem}/${today}`);
+        dbRef.once("value")
+         .then( snap => {
+             this.setState({ ifexists: snap.child("flag").exists() })
+         })
+        if (this.setState.ifexists) {
+            firebase.database().ref(`/attendance/${stream_sem}/${today}`)
+                .set({ flag })
+                .then(() => Actions.attendanceList());
+        }
+        else {
+            Actions.attendanceList();
+        }
     }
     signOut() {
         firebase.auth().signOut();
