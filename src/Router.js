@@ -8,6 +8,8 @@ import Attendance from './components/Attendance';
 import LoginTeacher from './components/LoginTeacher';
 import TeacherProfile from './components/TeacherProfile';
 import StudentList from './components/StudentList';
+import AttendanceList from './components/AttendanceList';
+import AllowAttendance from './components/AllowAttendance';
 
 const RouterComponent = () => {
     return (
@@ -22,10 +24,12 @@ const RouterComponent = () => {
                 <Scene key="main">
                     <Scene key="studentProfile" component={Profile} hideNavBar={true} />
                     <Scene key="attendance" component={Attendance} />
+                    <Scene key="allowAttendance" component={AllowAttendance} />
                 </Scene>
                 <Scene key="teacher">
                     <Scene key="teacherProfile" component={TeacherProfile} hideNavBar={true} />
                     <Scene key="studentList" component={StudentList} />
+                    <Scene key="attendanceList" component={AttendanceList}/>
                 </Scene>
             </Scene>
         </Router>
