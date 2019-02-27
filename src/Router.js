@@ -24,12 +24,12 @@ const RouterComponent = () => {
                 <Scene key="main">
                     <Scene key="studentProfile" component={Profile} hideNavBar={true} />
                     <Scene key="attendance" component={Attendance} />
-                    <Scene key="allowAttendance" component={AllowAttendance} />
+                    <Scene key="allowAttendance" component={AllowAttendance} title="Attendance"/>
                 </Scene>
                 <Scene key="teacher">
                     <Scene key="teacherProfile" component={TeacherProfile} hideNavBar={true} />
-                    <Scene key="studentList" component={StudentList} />
-                    <Scene key="attendanceList" component={AttendanceList}/>
+                    <Scene key="studentList" component={StudentList} title="Student List"/>
+                    <Scene key="attendanceList" component={AttendanceList} title="Today's Attendance"/>
                 </Scene>
             </Scene>
         </Router>

@@ -3,6 +3,7 @@ import {
     View,
     Image,
     Text,
+    StyleSheet,
     Dimensions,
     TouchableOpacity
 } from 'react-native';
@@ -52,48 +53,48 @@ class Profile extends Component {
     render() {
         const { firstname, lastname, contact, uroll, semester, stream } = this.state;
         return (
-            <View style={{ flex: 1, paddingTop: 40, alignItems: 'center' }}>
+            <View style={styles.backgroundContainer}>
                 <Loader loading={this.state.loading} />
                 <View>
                     <Image style={{ height: 150, width: 150, borderRadius: 75 }} source={{ uri: this.state.image }} />
                 </View>
-                <View style={{paddingLeft: 16,paddingBottom: 16,flexDirection: 'row'}}>
-                    <Text style={{color: 'black',flex: 1,fontSize: 20,fontWeight: '200',marginTop: 10,opacity: 0.5,alignItems: 'center'}}>
+                <View style={styles.displayContent}>
+                    <Text style={styles.titleContent}>
                         Name :
                     </Text>
-                    <Text style={{color: 'black',flex: 1,fontSize: 15,fontWeight: '200',marginTop: 10,opacity: 0.5,alignItems: 'center'}}>
+                    <Text style={styles.valueContent}>
                         {firstname.concat(' ').concat(lastname)}
                     </Text>
                 </View>
-                <View style={{paddingLeft: 16,paddingBottom: 16,flexDirection: 'row'}}>
-                    <Text style={{color: 'black',flex: 1,fontSize: 20,fontWeight: '200',marginTop: 10,opacity: 0.5,alignItems: 'center'}}>
+                <View style={styles.displayContent}>
+                    <Text style={styles.titleContent}>
                         University Roll No :
                     </Text>
-                    <Text style={{color: 'black',flex: 1,fontSize: 15,fontWeight: '200',marginTop: 10,opacity: 0.5,alignItems: 'center'}}>
+                    <Text style={styles.valueContent}>
                         {uroll}
                     </Text>
                 </View>
-                <View style={{paddingLeft: 16,paddingBottom: 16,flexDirection: 'row'}}>
-                    <Text style={{color: 'black',flex: 1,fontSize: 20,fontWeight: '200',marginTop: 10,opacity: 0.5,alignItems: 'center'}}>
+                <View style={styles.displayContent}>
+                    <Text style={styles.titleContent}>
                         Contact :
                     </Text>
-                    <Text style={{color: 'black',flex: 1,fontSize: 15,fontWeight: '200',marginTop: 10,opacity: 0.5,alignItems: 'center'}}>
+                    <Text style={styles.valueContent}>
                         {contact}
                     </Text>
                 </View>
-                <View style={{paddingLeft: 16,paddingBottom: 16,flexDirection: 'row'}}>
-                    <Text style={{color: 'black',flex: 1,fontSize: 20,fontWeight: '200',marginTop: 10,opacity: 0.5,alignItems: 'center'}}>
+                <View style={styles.displayContent}>
+                    <Text style={styles.titleContent}>
                         Department :
                     </Text>
-                    <Text style={{color: 'black',flex: 1,fontSize: 15,fontWeight: '200',marginTop: 10,opacity: 0.5,alignItems: 'center'}}>
+                    <Text style={styles.valueContent}>
                         {stream}
                     </Text>
                 </View>
-                <View style={{paddingLeft: 16,paddingBottom: 16,flexDirection: 'row'}}>
-                    <Text style={{color: 'black',flex: 1,fontSize: 20,fontWeight: '200',marginTop: 10,opacity: 0.5,alignItems: 'center'}}>
+                <View style={styles.displayContent}>
+                    <Text style={styles.titleContent}>
                         Semester :
                     </Text>
-                    <Text style={{color: 'black',flex: 1,fontSize: 15,fontWeight: '200',marginTop: 10,opacity: 0.5,alignItems: 'center'}}>
+                    <Text style={styles.valueContent}>
                         {semester}
                     </Text>
                 </View>
@@ -109,7 +110,7 @@ class Profile extends Component {
         );
     }
 }
-styles = {
+const styles = StyleSheet.create({
     btnLogin: {
         width: WIDTH - 55,
         height: 45,
@@ -159,5 +160,5 @@ styles = {
         opacity: 0.5,
         alignItems: 'center'
     }
-};
+});
 export default Profile;

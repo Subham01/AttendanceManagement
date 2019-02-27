@@ -16,17 +16,6 @@ export default class App extends Component {
       messagingSenderId: "680452651401"
     };
     firebase.initializeApp(config);
-    // firebase.auth().onAuthStateChanged((user) => {
-    //   if (user) {
-    //     this.setState({ loggedIn: true });
-    //   } 
-    //   else {
-    //     this.setState({ loggedIn: false });
-    //   }
-    // });
-  }
-  componentWillUnmount() {
-    this.authSubscription();
   }
   render() {
     return (

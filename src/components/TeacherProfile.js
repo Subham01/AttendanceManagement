@@ -1,5 +1,6 @@
 import React, { Component } from 'react';
 import {
+    StyleSheet,
     View,
     Image,
     Text,
@@ -24,11 +25,11 @@ class TeacherProfile extends Component {
         stream: '',
         stream_sem: ''
     };
-    componentWillMount() {
+    componentDidMount() {
         const { currentUser } = firebase.auth();
         firebase
             .database()
-            .ref('teacher')
+            .ref('teacher/')
             .child(currentUser.uid)
             .once('value', snap =>
                 this.setState({
@@ -57,19 +58,34 @@ class TeacherProfile extends Component {
         }
         const flag = true;
         today = mm + dd + yyyy;
-        const dbRef = firebase.database().ref(`/attendance/${stream_sem}/${today}`);
-        dbRef.once("value")
-         .then( snap => {
-             this.setState({ ifexists: snap.child("flag").exists() })
-         })
-        if (this.setState.ifexists) {
-            firebase.database().ref(`/attendance/${stream_sem}/${today}`)
-                .set({ flag })
-                .then(() => Actions.attendanceList());
-        }
-        else {
-            Actions.attendanceList();
-        }
+        firebase.database().ref(`/attendance/${stream_sem}`)
+        .once("value")
+            .then( snap => {
+                const todayExist = snap.child(today).exists();
+                if(todayExist == false) {
+                    firebase.database().ref(`/attendance/${stream_sem}/${today}`)
+                            .set({ flag })
+                            .then(() => Actions.attendanceList());
+                }
+                else {
+                    Actions.attendanceList();
+                }
+            });
+        // const dbRef = firebase.database().ref(`/attendance/${stream_sem}/${today}`);
+        // dbRef.once("value")
+        //     .then(snap => {
+        //         this.setState({ ifexists: snap.child("flag").exists() }, () => {
+        //             console.log("If Exist = "+this.state.ifexists);
+        //             if (this.setState.ifexists) {
+        //                 firebase.database().ref(`/attendance/${stream_sem}/${today}`)
+        //                     .set({ flag })
+        //                     .then(() => Actions.attendanceList());
+        //             }
+        //             else {
+        //                 Actions.attendanceList();
+        //             }
+        //         })
+        //     })
     }
     signOut() {
         firebase.auth().signOut();
@@ -121,23 +137,25 @@ class TeacherProfile extends Component {
                         {semester}
                     </Text>
                 </View>
-                <TouchableOpacity style={styles.btnLogin}
-                    onPress={() => Actions.studentList()}>
-                    <Text style={styles.text}>Student List</Text>
-                </TouchableOpacity>
-                <TouchableOpacity style={styles.btnLogin}
-                    onPress={this.startAttendance.bind(this)}>
-                    <Text style={styles.text}>Start Attendance</Text>
-                </TouchableOpacity>
-                <TouchableOpacity style={styles.btnLogin}
-                    onPress={this.signOut.bind(this)}>
-                    <Text style={styles.text}>Sign Out</Text>
-                </TouchableOpacity>
+                <View style={{alignItems: 'center'}}>
+                    <TouchableOpacity style={styles.btnLogin}
+                        onPress={() => Actions.studentList()}>
+                        <Text style={styles.text}>Student List</Text>
+                    </TouchableOpacity>
+                    <TouchableOpacity style={styles.btnLogin}
+                        onPress={this.startAttendance.bind(this)}>
+                        <Text style={styles.text}>Start Attendance</Text>
+                    </TouchableOpacity>
+                    <TouchableOpacity style={styles.btnLogin}
+                        onPress={this.signOut.bind(this)}>
+                        <Text style={styles.text}>Sign Out</Text>
+                    </TouchableOpacity>
+                </View>
             </View>
         );
     }
 }
-styles = {
+const styles = StyleSheet.create({
     btnLogin: {
         width: WIDTH - 55,
         height: 45,
@@ -187,5 +205,5 @@ styles = {
         opacity: 0.5,
         alignItems: 'center'
     }
-};
+});
 export default TeacherProfile;

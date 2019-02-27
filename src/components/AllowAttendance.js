@@ -31,13 +31,14 @@ class AllowAttendance extends Component {
         userId: '',
         firstname: '',
         lastname: '',
+        alreadymarked: false,
         image: null,
         submit: false,
         loading: false,
         setDatabase: true,
         face: null,
         confidence: 0,
-        Error: false,
+        startedAttendance: true,
         class: '',
         flag: null,
     };
@@ -60,12 +61,34 @@ class AllowAttendance extends Component {
             .database()
             .ref('attendance/')
             .child(this.props.class)
-            .child(today)
-            .on('value', snap =>
-                this.setState({
-                    flag: snap.val().flag,
+            .once("value")
+            .then(snap => {
+                this.setState({ startedAttendance: snap.child(today).exists() }, () => {
+                    if (this.state.startedAttendance) {
+                        firebase
+                            .database()
+                            .ref('attendance/')
+                            .child(this.props.class)
+                            .child(today)
+                            .on('value', snap =>
+                                this.setState({
+                                    flag: snap.val().flag,
+                                })
+                            )
+                    }
                 })
-            );
+            });
+        firebase.database().ref(`/attendance/${this.props.class}/${today}`)
+            .once("value")
+            .then(snapshot => {
+                const list = Object.values(snapshot.val());
+                for (i = 0; i < (list.length - 1); i++) {
+                    if (currentUser.uid === list[i].userId) {
+                        this.setState({ alreadymarked: true });
+                        break;
+                    }
+                }
+            });
     }
     upload = async (requestUrl, data) => {
         let options = {
@@ -117,37 +140,47 @@ class AllowAttendance extends Component {
         );
     }
     renderContent() {
-        if (this.state.Error == false) {
+        if (this.state.startedAttendance == true) {
             if (this.state.flag == false) {
                 return (
-                    <Text>
+                    <Text style={styles.messageContainer}>
                         Attendance Not Allowed
                     </Text>
                 );
             }
             else {
-                if (this.state.submit == false) {
+                if (this.state.alreadymarked) {
                     return (
-                        <View>
-                            {this.renderButtons()}
-                            {this._maybeRenderImage()}
-                            {this.submitButtons()}
-                        </View>
+                        <Text style={styles.messageContainer}>
+                            Already Marked.
+                        </Text>
                     );
                 }
                 else {
-                    return (
-                        <View style={{ backgroundColor: '#FFFFFF' }}>
-                            <Image source={successgif} style={styles.logo} />
-                            {this.identified()}
-                        </View>
-                    );
+                    if (this.state.submit == false) {
+                        return (
+                            <View>
+                                {this.renderButtons()}
+                                {this._maybeRenderImage()}
+                                {this.submitButtons()}
+                            </View>
+                        );
+                    }
+                    else {
+                        return (
+                            <View style={{ backgroundColor: '#FFFFFF' }}>
+                                <Image source={successgif} style={styles.logo} />
+                                {this.identified()}
+                            </View>
+                        );
+                    }
                 }
+
             }
         }
         else {
             return (
-                <Text>
+                <Text style={styles.messageContainer}>
                     Teacher Not Started Attendance
                 </Text>
             );
@@ -167,7 +200,7 @@ class AllowAttendance extends Component {
                         image: this.state.image,
                         name: firstname.concat(' ').concat(lastname)
                     });
-                if(this.state.setDatabase) {
+                if (this.state.setDatabase) {
                     this.setState({ setDatabase: false });
                 }
             }
@@ -199,7 +232,7 @@ class AllowAttendance extends Component {
             return;
         }
         return (
-            <View>
+            <View style={{ alignItems: 'center' }}>
                 <Image source={{ uri: image }} style={{ width: 140, height: 140, paddingLeft: 20 + 0 }} />
             </View>
         );
@@ -252,6 +285,7 @@ async function uploadImageAsync(uri) {
 }
 const styles = {
     Conatiner: {
+        paddingTop: 30,
         alignItems: 'center',
         justifyContent: 'center'
     },
@@ -279,6 +313,13 @@ const styles = {
         fontSize: 16,
         textAlign: 'center',
         color: 'white'
+    },
+    messageContainer: {
+        color: 'black',
+        fontSize: 30,
+        fontWeight: '200',
+        marginTop: 10,
+        opacity: 0.5,
     },
 };
 export default AllowAttendance;

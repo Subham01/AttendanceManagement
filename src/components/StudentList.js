@@ -3,7 +3,8 @@ import {
     ScrollView,
     Text,
     View,
-    Image
+    Image,
+    StyleSheet
 } from 'react-native';
 import * as firebase from 'firebase';
 import Loader from './Loader';
@@ -37,7 +38,9 @@ export default class StudentList extends Component {
                     const newObj = {
                         key: i.toString(),
                         name: fname.concat(' ').concat(lname),
-                        image: list[i].image
+                        image: list[i].image,
+                        contact: list[i].contact,
+                        roll: list[i].uroll
                     }
                     studentList = [...studentList, newObj]
                 }
@@ -51,14 +54,18 @@ export default class StudentList extends Component {
                 {
                     this.state.students.map(student => {
                         return(
-                            <View key={student.key} style={{flexDirection: 'row', alignItems: 'center'}}>
+                            <View key={student.key} style={styles.backgroundContainer}>
                                 <View>
-                                    <Image source={{uri: student.image}} style={{height: 90, width: 90}} />
+                                    <Image source={{uri: student.image}} style={styles.imageStyle} />
                                 </View>
-                                <View>
-                                    <Text>
+                                <View style={{paddingLeft: 10}}>
+                                    <Text style={styles.nameStyle}>
                                         {student.name}
                                     </Text>
+                                    <Text style={styles.RollStyle}>
+                                        {student.roll}
+                                    </Text>
+                                    
                                 </View>
                             </View>
                         );
@@ -68,3 +75,33 @@ export default class StudentList extends Component {
         );
     }
 }
+const styles = StyleSheet.create({
+    backgroundContainer: {
+        flexDirection: 'row',
+        paddingLeft: 20,
+        paddingTop: 20,
+        paddingBottom: 10,
+        borderBottomWidth: 1,
+    },
+    imageStyle: {
+        height: 70,
+        width: 70,
+        borderRadius: 35,
+        paddingLeft: '20%',
+    },
+    nameStyle: {
+        color: 'black',
+        fontSize: 18,
+        fontWeight: '200',
+        marginTop: 10,
+        opacity: 0.5,
+    },
+    RollStyle: {
+        color: 'black',
+        fontSize: 14,
+        fontWeight: '200',
+        marginTop: 10,
+        opacity: 0.5,
+    },
+
+});
