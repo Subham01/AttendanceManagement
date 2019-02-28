@@ -25,8 +25,8 @@ class Profile extends Component {
         class: '',
         image: '',
     };
-    componentDidMount() {
-        const { currentUser } = firebase.auth();
+    async componentDidMount() {
+        const { currentUser } = await firebase.auth();
         firebase
             .database()
             .ref('users/')

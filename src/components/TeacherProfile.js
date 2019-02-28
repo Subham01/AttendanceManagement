@@ -26,23 +26,31 @@ class TeacherProfile extends Component {
         stream_sem: ''
     };
     componentDidMount() {
-        const { currentUser } = firebase.auth();
-        firebase
-            .database()
-            .ref('teacher/')
-            .child(currentUser.uid)
-            .once('value', snap =>
-                this.setState({
-                    teacherId: snap.val().teacherId,
-                    firstname: snap.val().firstname,
-                    lastname: snap.val().lastname,
-                    contact: snap.val().contact,
-                    semester: snap.val().semester,
-                    stream: snap.val().stream,
-                    stream_sem: snap.val().stream_sem,
-                    loading: false,
-                })
-            );
+        try {
+            const { currentUser } = firebase.auth();
+            console.log("Obj =>  ", currentUser.uid);
+            firebase
+                .database()
+                .ref('teacher/')
+                .child(currentUser.uid)
+                .once('value', snap =>
+                    this.setState({
+                        teacherId: snap.val().teacherId,
+                        firstname: snap.val().firstname,
+                        lastname: snap.val().lastname,
+                        contact: snap.val().contact,
+                        semester: snap.val().semester,
+                        stream: snap.val().stream,
+                        stream_sem: snap.val().stream_sem,
+                        loading: false,
+                    })
+                );
+        } catch (e) {
+            this.setState({ loading: false });
+            alert('OOPs. Try Again!');
+            Actions.auth();
+            Actions.login();
+        }
     }
     startAttendance() {
         const { stream_sem } = this.state;
@@ -59,13 +67,13 @@ class TeacherProfile extends Component {
         const flag = true;
         today = mm + dd + yyyy;
         firebase.database().ref(`/attendance/${stream_sem}`)
-        .once("value")
-            .then( snap => {
+            .once("value")
+            .then(snap => {
                 const todayExist = snap.child(today).exists();
-                if(todayExist == false) {
+                if (todayExist == false) {
                     firebase.database().ref(`/attendance/${stream_sem}/${today}`)
-                            .set({ flag })
-                            .then(() => Actions.attendanceList());
+                        .set({ flag })
+                        .then(() => Actions.attendanceList());
                 }
                 else {
                     Actions.attendanceList();
@@ -137,7 +145,7 @@ class TeacherProfile extends Component {
                         {semester}
                     </Text>
                 </View>
-                <View style={{alignItems: 'center'}}>
+                <View style={{ alignItems: 'center' }}>
                     <TouchableOpacity style={styles.btnLogin}
                         onPress={() => Actions.studentList()}>
                         <Text style={styles.text}>Student List</Text>

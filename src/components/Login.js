@@ -9,8 +9,7 @@ import {
     TextInput,
     TouchableOpacity
 } from 'react-native';
-import firebase from '@firebase/app';
-require('firebase/auth');
+import * as firebase from 'firebase';
 import { Actions } from 'react-native-router-flux';
 import Icon from 'react-native-vector-icons/Ionicons';
 import logo from '../Images/logo.png';
@@ -22,6 +21,7 @@ const { width: WIDTH } = Dimensions.get('window');
 export default class Login extends Component {
     state = {
         email: '',
+        correctLogin: null,
         password: '',
         error: '',
         loading: false,
@@ -33,29 +33,68 @@ export default class Login extends Component {
         this.setState({ loading: true });
         const { email, password } = this.state;
         firebase.auth().signInWithEmailAndPassword(email, password)
-            .then(this.onLoginSuccess.bind(this))
-            .then(() => Actions.main(), () => Actions.studentProfile())
+            .then(() => {
+                const { currentUser } = firebase.auth();
+                firebase.database().ref('users').child(currentUser.uid)
+                .once("value")
+                .then(snap => {
+                    const newState = snap.child('uroll').exists() ? true : false;
+                    this.setState({ correctLogin: newState }, () => {
+                        {this.onLoginSuccess()}
+                        {
+                            if(this.state.correctLogin) {
+                                Actions.main();
+                                Actions.studentProfile();
+                            }
+                        }
+                    })
+                })
+            })
             .catch(this.onLoginFail.bind(this));
     }
     onTeacherLoginButtonPress() {
         this.setState({ loading: true });
         const { email, password } = this.state;
         firebase.auth().signInWithEmailAndPassword(email, password)
-            .then(this.onLoginSuccess.bind(this))
-            .then(Actions.teacher(),Actions.teacherProfile())
+            .then(() => {
+                const { currentUser } = firebase.auth();
+                firebase.database().ref('teacher').child(currentUser.uid)
+                .once("value")
+                .then(snap => {
+                    const newState = snap.child('teacherId').exists() ? true : false;
+                    this.setState({ correctLogin: newState }, () => {
+                        {this.onLoginSuccess()}
+                        {
+                            if(this.state.correctLogin) {
+                                Actions.teacher();
+                                Actions.teacherProfile();
+                            }
+                        }
+                    })
+                })
+            })
             .catch(this.onLoginFail.bind(this));
     }
     onLoginFail() {
         this.setState({ email: '', password: '', error: 'Authentication Failed', loading: false });
     }
-
     onLoginSuccess() {
-        this.setState({
-            email: '',
-            password: '',
-            loading: false,
-            error: ''
-        });
+        if(this.state.correctLogin) {
+            this.setState({
+                email: '',
+                password: '',
+                loading: false,
+                error: ''
+            });
+        }
+        else {
+            this.setState({
+                email: '',
+                password: '',
+                loading: false,
+                error: 'Wrong Login Choice'
+            });
+        }
     }
     renderButton() {
         return (
