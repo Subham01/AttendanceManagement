@@ -8,6 +8,7 @@ import {
     TouchableOpacity
 } from 'react-native';
 import * as firebase from 'firebase';
+import Icon from 'react-native-vector-icons/Ionicons';
 import { Actions } from 'react-native-router-flux';
 import Loader from './Loader';
 
@@ -15,6 +16,7 @@ const { width: WIDTH } = Dimensions.get('window');
 
 class Profile extends Component {
     state = {
+        email: '',
         firstname: '',
         lastname: '',
         contact: '',
@@ -33,6 +35,7 @@ class Profile extends Component {
             .child(currentUser.uid)
             .once('value', snap =>
                 this.setState({
+                    email: currentUser.email,
                     uroll: snap.val().uroll,
                     firstname: snap.val().firstname,
                     image: snap.val().image,
@@ -51,56 +54,29 @@ class Profile extends Component {
         Actions.login();
     }
     render() {
-        const { firstname, lastname, contact, uroll, semester, stream } = this.state;
+        const { firstname, lastname, email, contact, uroll, semester, stream } = this.state;
         return (
             <View style={styles.backgroundContainer}>
                 <Loader loading={this.state.loading} />
-                <View>
-                    <Image style={{ height: 150, width: 150, borderRadius: 75 }} source={{ uri: this.state.image }} />
-                </View>
-                <View style={styles.displayContent}>
-                    <Text style={styles.titleContent}>
-                        Name :
-                    </Text>
-                    <Text style={styles.valueContent}>
+                <View style={{ borderBottomWidth: 1, width: WIDTH, alignItems: 'center' }}>
+                    <Image style={{ height: 120, width: 120, borderRadius: 60 }} source={{ uri: this.state.image }} />
+                    <Text style={styles.displayContent}>
                         {firstname.concat(' ').concat(lastname)}
                     </Text>
-                </View>
-                <View style={styles.displayContent}>
-                    <Text style={styles.titleContent}>
-                        University Roll No :
+                    <Text style={styles.valueContent}>
+                        {email}
                     </Text>
                     <Text style={styles.valueContent}>
                         {uroll}
                     </Text>
                 </View>
-                <View style={styles.displayContent}>
-                    <Text style={styles.titleContent}>
-                        Contact :
-                    </Text>
-                    <Text style={styles.valueContent}>
-                        {contact}
-                    </Text>
-                </View>
-                <View style={styles.displayContent}>
-                    <Text style={styles.titleContent}>
-                        Department :
-                    </Text>
-                    <Text style={styles.valueContent}>
-                        {stream}
-                    </Text>
-                </View>
-                <View style={styles.displayContent}>
-                    <Text style={styles.titleContent}>
-                        Semester :
-                    </Text>
-                    <Text style={styles.valueContent}>
-                        {semester}
-                    </Text>
-                </View>
                 <TouchableOpacity style={styles.btnLogin}
-                    onPress={() => Actions.allowAttendance({class: this.state.class})}>
+                    onPress={() => Actions.allowAttendance({ class: this.state.class })}>
                     <Text style={styles.text}>Attendance</Text>
+                </TouchableOpacity>
+                <TouchableOpacity style={styles.btnLogin}
+                    onPress={() => Actions.attendanceView({class : this.state.class})}>
+                    <Text style={styles.text}>Attendance Log</Text>
                 </TouchableOpacity>
                 <TouchableOpacity style={styles.btnLogin}
                     onPress={this.signOut.bind(this)}>
@@ -138,27 +114,16 @@ const styles = StyleSheet.create({
         alignItems: 'center'
     },
     displayContent: {
-        paddingLeft: 16,
-        paddingBottom: 16,
-        flexDirection: 'row',
-    },
-    titleContent: {
-        color: 'black',
-        flex: 1,
         fontSize: 20,
         fontWeight: '200',
-        marginTop: 10,
-        opacity: 0.5,
-        alignItems: 'center'
+        paddingTop: 5,
     },
     valueContent: {
         color: 'black',
-        flex: 1,
         fontSize: 15,
         fontWeight: '200',
-        marginTop: 10,
         opacity: 0.5,
-        alignItems: 'center'
-    }
+        paddingBottom: 10,
+    },
 });
 export default Profile;

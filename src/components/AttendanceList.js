@@ -103,10 +103,6 @@ export default class AttendanceList extends Component {
             <View style={{ alignItems: 'center' }}>
                 <ScrollView>
                     {this.renderButton()}
-                    <TouchableOpacity style={styles.btnLogin}
-                        onPress={this.forceUpdateHandler}>
-                        <Text style={styles.text}>Refresh</Text>
-                    </TouchableOpacity>
                     {this.display()}
                     {
                         this.state.students.map(student => {

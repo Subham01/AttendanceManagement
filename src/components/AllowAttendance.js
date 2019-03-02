@@ -23,7 +23,7 @@ if (mm < 10) {
     mm = '0' + mm;
 }
 today = mm + dd + yyyy;
-const api_url = 'http://106.51.58.118:5000/compare_faces?face_det=1';
+const api_url = 'http://35.197.139.14/compare_faces?face_det=1';
 const { width: WIDTH } = Dimensions.get('window');
 
 class AllowAttendance extends Component {
