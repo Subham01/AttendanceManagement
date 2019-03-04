@@ -23,13 +23,13 @@ const RouterComponent = () => {
                     <Scene key="newTeacher" component={LoginTeacher} title="Step 2" />
                 </Scene>
                 <Scene key="main">
-                    <Scene key="studentProfile" component={Profile} hideNavBar={true} />
+                    <Scene key="studentProfile" component={Profile} hideNavBar={true} panHandlers={null}/>
                     <Scene key="attendance" component={Attendance} />
                     <Scene key="allowAttendance" component={AllowAttendance} title="Attendance"/>
                     <Scene key="attendanceView" component={AttendanceView} title="Attendance Log" />
                 </Scene>
                 <Scene key="teacher">
-                    <Scene key="teacherProfile" component={TeacherProfile} hideNavBar={true} />
+                    <Scene key="teacherProfile" component={TeacherProfile} hideNavBar={true} panHandlers={null}/>
                     <Scene key="studentList" component={StudentList} title="Student List"/>
                     <Scene key="attendanceList" component={AttendanceList} title="Today's Attendance"/>
                 </Scene>

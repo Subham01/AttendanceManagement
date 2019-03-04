@@ -23,7 +23,7 @@ if (mm < 10) {
     mm = '0' + mm;
 }
 today = mm + dd + yyyy;
-const api_url = 'http://35.197.139.14/compare_faces?face_det=1';
+const api_url = 'http://facexapi.com/compare_faces?face_det=1';
 const { width: WIDTH } = Dimensions.get('window');
 
 class AllowAttendance extends Component {
@@ -43,7 +43,7 @@ class AllowAttendance extends Component {
         flag: null,
     };
     async componentDidMount() {
-        await Permissions.askAsync(Permissions.CAMERA);
+        await Permissions.askAsync(Permissions.CAMERA, Permissions.CAMERA_ROLL);
         const { currentUser } = firebase.auth();
         firebase
             .database()
@@ -169,7 +169,6 @@ class AllowAttendance extends Component {
                     else {
                         return (
                             <View style={{ backgroundColor: '#FFFFFF' }}>
-                                <Image source={successgif} style={styles.logo} />
                                 {this.identified()}
                             </View>
                         );
@@ -204,7 +203,12 @@ class AllowAttendance extends Component {
                     this.setState({ setDatabase: false });
                 }
             }
-            return (<Text>Identified! Confidence: {this.state.confidence}</Text>);
+            return (
+                <View>
+                    <Image source={successgif} style={styles.logo} />
+                    <Text>Identified! Confidence: {this.state.confidence}</Text>
+                </View>
+            );
         }
         else {
             return (<Text>Couldn't recognize you</Text>);

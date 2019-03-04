@@ -6,11 +6,14 @@ import {
 } from 'react-native';
 import * as firebase from 'firebase';
 import { Calendar } from 'react-native-calendars';
+import Loader from './Loader';
+
 class AttendanceView extends Component {
     state = {
         set: false,
         marked: null,
         date: [],
+        loading: true,
         presentDay: [],
         absentDay: []
     };
@@ -55,7 +58,7 @@ class AttendanceView extends Component {
                     }
                     //this.setState({presentDay: present, absentDay: absent}, () => this.anotherFunc())
                 })
-                setInterval(() => {resolve()},10000);
+                setInterval(() => {resolve()},5000);
         });
         promices.then(() =>{
             this.anotherFunc();
@@ -65,11 +68,12 @@ class AttendanceView extends Component {
         let obj1 = this.state.presentDay.reduce((c, v) => Object.assign(c, { [v]: { selected: true, marked: true, disabled: true, startingDay: true, color: 'green', endingDay: true } }), {});
         let obj2 = this.state.absentDay.reduce((c, v) => Object.assign(c, { [v]: { selected: true, marked: true, disabled: true, startingDay: true, color: 'red', endingDay: true } }), {});
         const days = Object.assign({}, obj1, obj2);
-        this.setState({ marked: days })
+        this.setState({ marked: days, loading: false })
     }
     render() {
         return (
             < View style={styles.container} >
+                <Loader loading={this.state.loading} />
                 <Calendar
                     style={styles.calendar}
                     onMonthChange={(month) => { console.log('month changed', month) }}
