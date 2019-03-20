@@ -7,7 +7,6 @@ import {
 import * as firebase from 'firebase';
 import { Calendar } from 'react-native-calendars';
 import Loader from './Loader';
-
 class AttendanceView extends Component {
     state = {
         set: false,
@@ -58,7 +57,7 @@ class AttendanceView extends Component {
                     }
                     //this.setState({presentDay: present, absentDay: absent}, () => this.anotherFunc())
                 })
-                setInterval(() => {resolve()},5000);
+                setInterval(() => {resolve()},6000);
         });
         promices.then(() =>{
             this.anotherFunc();

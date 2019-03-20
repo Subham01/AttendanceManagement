@@ -75,8 +75,12 @@ class Profile extends Component {
                     <Text style={styles.text}>Attendance</Text>
                 </TouchableOpacity>
                 <TouchableOpacity style={styles.btnLogin}
-                    onPress={() => Actions.attendanceView({class : this.state.class})}>
+                    onPress={() => Actions.attendanceView({ class: this.state.class })}>
                     <Text style={styles.text}>Attendance Log</Text>
+                </TouchableOpacity>
+                <TouchableOpacity style={styles.btnLogin}
+                    onPress={() => Actions.seeNotice({ class: this.state.class })}>
+                    <Text style={styles.text}>Notice</Text>
                 </TouchableOpacity>
                 <TouchableOpacity style={styles.btnLogin}
                     onPress={this.signOut.bind(this)}>

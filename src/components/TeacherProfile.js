@@ -4,6 +4,7 @@ import {
     View,
     Image,
     Text,
+    ScrollView,
     Dimensions,
     TouchableOpacity
 } from 'react-native';
@@ -103,63 +104,73 @@ class TeacherProfile extends Component {
     render() {
         const { firstname, lastname, contact, teacherId, semester, stream } = this.state;
         return (
-            <View style={styles.backgroundContainer}>
-                <Loader loading={this.state.loading} />
-                <View style={styles.displayContent}>
-                    <Text style={styles.titleContent}>
-                        Name :
+            <ScrollView>
+                <View style={styles.backgroundContainer}>
+                    <Loader loading={this.state.loading} />
+                    <View style={styles.displayContent}>
+                        <Text style={styles.titleContent}>
+                            Name :
                     </Text>
-                    <Text style={styles.valueContent}>
-                        {firstname.concat(' ').concat(lastname)}
+                        <Text style={styles.valueContent}>
+                            {firstname.concat(' ').concat(lastname)}
+                        </Text>
+                    </View>
+                    <View style={styles.displayContent}>
+                        <Text style={styles.titleContent}>
+                            Employee No. :
                     </Text>
+                        <Text style={styles.valueContent}>
+                            {teacherId}
+                        </Text>
+                    </View>
+                    <View style={styles.displayContent}>
+                        <Text style={styles.titleContent}>
+                            Contact :
+                    </Text>
+                        <Text style={styles.valueContent}>
+                            {contact}
+                        </Text>
+                    </View>
+                    <View style={styles.displayContent}>
+                        <Text style={styles.titleContent}>
+                            Department :
+                    </Text>
+                        <Text style={styles.valueContent}>
+                            {stream}
+                        </Text>
+                    </View>
+                    <View style={styles.displayContent}>
+                        <Text style={styles.titleContent}>
+                            Semester :
+                    </Text>
+                        <Text style={styles.valueContent}>
+                            {semester}
+                        </Text>
+                    </View>
+                    <View style={{ alignItems: 'center' }}>
+                        <TouchableOpacity style={styles.btnLogin}
+                            onPress={() => Actions.studentList()}>
+                            <Text style={styles.text}>Student List</Text>
+                        </TouchableOpacity>
+                        <TouchableOpacity style={styles.btnLogin}
+                            onPress={this.startAttendance.bind(this)}>
+                            <Text style={styles.text}>Start Attendance</Text>
+                        </TouchableOpacity>
+                        <TouchableOpacity style={styles.btnLogin}
+                            onPress={() => Actions.generateExcel({class: this.state.stream_sem})}>
+                            <Text style={styles.text}>Excel</Text>
+                        </TouchableOpacity>
+                        <TouchableOpacity style={styles.btnLogin}
+                            onPress={() => Actions.addNotice({class: this.state.stream_sem})}>
+                            <Text style={styles.text}>Send Notice</Text>
+                        </TouchableOpacity>
+                        <TouchableOpacity style={styles.btnLogin}
+                            onPress={this.signOut.bind(this)}>
+                            <Text style={styles.text}>Sign Out</Text>
+                        </TouchableOpacity>
+                    </View>
                 </View>
-                <View style={styles.displayContent}>
-                    <Text style={styles.titleContent}>
-                        Employee No. :
-                    </Text>
-                    <Text style={styles.valueContent}>
-                        {teacherId}
-                    </Text>
-                </View>
-                <View style={styles.displayContent}>
-                    <Text style={styles.titleContent}>
-                        Contact :
-                    </Text>
-                    <Text style={styles.valueContent}>
-                        {contact}
-                    </Text>
-                </View>
-                <View style={styles.displayContent}>
-                    <Text style={styles.titleContent}>
-                        Department :
-                    </Text>
-                    <Text style={styles.valueContent}>
-                        {stream}
-                    </Text>
-                </View>
-                <View style={styles.displayContent}>
-                    <Text style={styles.titleContent}>
-                        Semester :
-                    </Text>
-                    <Text style={styles.valueContent}>
-                        {semester}
-                    </Text>
-                </View>
-                <View style={{ alignItems: 'center' }}>
-                    <TouchableOpacity style={styles.btnLogin}
-                        onPress={() => Actions.studentList()}>
-                        <Text style={styles.text}>Student List</Text>
-                    </TouchableOpacity>
-                    <TouchableOpacity style={styles.btnLogin}
-                        onPress={this.startAttendance.bind(this)}>
-                        <Text style={styles.text}>Start Attendance</Text>
-                    </TouchableOpacity>
-                    <TouchableOpacity style={styles.btnLogin}
-                        onPress={this.signOut.bind(this)}>
-                        <Text style={styles.text}>Sign Out</Text>
-                    </TouchableOpacity>
-                </View>
-            </View>
+            </ScrollView>
         );
     }
 }

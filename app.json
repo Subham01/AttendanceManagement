@@ -4,6 +4,17 @@
     "slug": "AttendanceManagement",
     "privacy": "public",
     "sdkVersion": "32.0.0",
+    "android": {
+    	"package": "com.AttendanceManagement.myapp",
+    	"permissions": [
+    		"CAMERA",
+			"READ_INTERNAL_STORAGE",
+			"WRITE_INTERNAL_STORAGE",
+			"READ_EXTERNAL_STORAGE",
+			"WRITE_EXTERNAL_STORAGE",
+			"CAMERA_ROLL"
+    	]
+    },
     "platforms": [
       "ios",
       "android"

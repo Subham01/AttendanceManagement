@@ -11,7 +11,9 @@ import StudentList from './components/StudentList';
 import AttendanceList from './components/AttendanceList';
 import AllowAttendance from './components/AllowAttendance';
 import AttendanceView from './components/AttendanceView';
-
+import GenerateExcel from './components/GenerateExcel';
+import AddNotice from './components/AddNotice';
+import SeeNotice from './components/SeeNotice';
 const RouterComponent = () => {
     return (
         <Router>
@@ -23,15 +25,18 @@ const RouterComponent = () => {
                     <Scene key="newTeacher" component={LoginTeacher} title="Step 2" />
                 </Scene>
                 <Scene key="main">
-                    <Scene key="studentProfile" component={Profile} hideNavBar={true} panHandlers={null}/>
+                    <Scene key="studentProfile" component={Profile} hideNavBar={true} />
                     <Scene key="attendance" component={Attendance} />
                     <Scene key="allowAttendance" component={AllowAttendance} title="Attendance"/>
                     <Scene key="attendanceView" component={AttendanceView} title="Attendance Log" />
+                    <Scene key="seeNotice" component={SeeNotice} title="Notice" />
                 </Scene>
                 <Scene key="teacher">
-                    <Scene key="teacherProfile" component={TeacherProfile} hideNavBar={true} panHandlers={null}/>
+                    <Scene key="teacherProfile" component={TeacherProfile} hideNavBar={true} />
                     <Scene key="studentList" component={StudentList} title="Student List"/>
                     <Scene key="attendanceList" component={AttendanceList} title="Today's Attendance"/>
+                    <Scene key="generateExcel" component={GenerateExcel} title="Excel" />
+                    <Scene key="addNotice" component={AddNotice} title="Notice" />
                 </Scene>
             </Scene>
         </Router>

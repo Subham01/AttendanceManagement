@@ -100,7 +100,7 @@ export default class AttendanceList extends Component {
     }
     render() {
         return (
-            <View style={{ alignItems: 'center' }}>
+            <View style={{ alignItems: 'center', flex: 1 }}>
                 <ScrollView>
                     {this.renderButton()}
                     {this.display()}
