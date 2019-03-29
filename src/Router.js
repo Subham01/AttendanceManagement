@@ -14,6 +14,8 @@ import AttendanceView from './components/AttendanceView';
 import GenerateExcel from './components/GenerateExcel';
 import AddNotice from './components/AddNotice';
 import SeeNotice from './components/SeeNotice';
+import Quiz from './components/Quiz';
+
 const RouterComponent = () => {
     return (
         <Router>
@@ -30,6 +32,7 @@ const RouterComponent = () => {
                     <Scene key="allowAttendance" component={AllowAttendance} title="Attendance"/>
                     <Scene key="attendanceView" component={AttendanceView} title="Attendance Log" />
                     <Scene key="seeNotice" component={SeeNotice} title="Notice" />
+                    <Scene key="quiz" component={Quiz} title="Quiz" hideNavBar={true}/>
                 </Scene>
                 <Scene key="teacher">
                     <Scene key="teacherProfile" component={TeacherProfile} hideNavBar={true} />

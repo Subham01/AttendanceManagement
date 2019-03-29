@@ -83,6 +83,10 @@ class Profile extends Component {
                     <Text style={styles.text}>Notice</Text>
                 </TouchableOpacity>
                 <TouchableOpacity style={styles.btnLogin}
+                    onPress={() => Actions.quiz({ class: this.state.class })}>
+                    <Text style={styles.text}>Quiz</Text>
+                </TouchableOpacity>
+                <TouchableOpacity style={styles.btnLogin}
                     onPress={this.signOut.bind(this)}>
                     <Text style={styles.text}>Sign Out</Text>
                 </TouchableOpacity>
