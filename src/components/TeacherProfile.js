@@ -161,6 +161,10 @@ class TeacherProfile extends Component {
                             <Text style={styles.text}>Excel</Text>
                         </TouchableOpacity>
                         <TouchableOpacity style={styles.btnLogin}
+                            onPress={() => Actions.viewQuiz({class: this.state.stream_sem})}>
+                            <Text style={styles.text}>Quiz</Text>
+                        </TouchableOpacity>
+                        <TouchableOpacity style={styles.btnLogin}
                             onPress={() => Actions.addNotice({class: this.state.stream_sem})}>
                             <Text style={styles.text}>Send Notice</Text>
                         </TouchableOpacity>

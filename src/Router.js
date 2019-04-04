@@ -4,7 +4,6 @@ import Login from './components/Login';
 import NewUserDetail from './components/NewUserDetail';
 import SignUp from './components/SignUp';
 import Profile from './components/Profile';
-import Attendance from './components/Attendance';
 import LoginTeacher from './components/LoginTeacher';
 import TeacherProfile from './components/TeacherProfile';
 import StudentList from './components/StudentList';
@@ -15,6 +14,7 @@ import GenerateExcel from './components/GenerateExcel';
 import AddNotice from './components/AddNotice';
 import SeeNotice from './components/SeeNotice';
 import Quiz from './components/Quiz';
+import ViewQuiz from './components/ViewQuiz';
 
 const RouterComponent = () => {
     return (
@@ -28,7 +28,6 @@ const RouterComponent = () => {
                 </Scene>
                 <Scene key="main">
                     <Scene key="studentProfile" component={Profile} hideNavBar={true} />
-                    <Scene key="attendance" component={Attendance} />
                     <Scene key="allowAttendance" component={AllowAttendance} title="Attendance"/>
                     <Scene key="attendanceView" component={AttendanceView} title="Attendance Log" />
                     <Scene key="seeNotice" component={SeeNotice} title="Notice" />
@@ -40,6 +39,7 @@ const RouterComponent = () => {
                     <Scene key="attendanceList" component={AttendanceList} title="Today's Attendance"/>
                     <Scene key="generateExcel" component={GenerateExcel} title="Excel" />
                     <Scene key="addNotice" component={AddNotice} title="Notice" />
+                    <Scene key="viewQuiz" component={ViewQuiz} title="Quiz" />
                 </Scene>
             </Scene>
         </Router>

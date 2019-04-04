@@ -13,10 +13,22 @@ import {
 } from 'react-native';
 import * as firebase from 'firebase';
 import Icon from 'react-native-vector-icons/Ionicons';
+import CountDown from 'react-native-countdown-component';
 import Loader from './Loader';
 const { width, height } = Dimensions.get('window');
 const { width: WIDTH } = Dimensions.get('window');
-let selectedOption = ''
+let selectedOption = '';
+var today = new Date();
+var dd = today.getDate();
+var mm = today.getMonth() + 1;
+var yyyy = today.getFullYear();
+if (dd < 10) {
+  dd = '0' + dd;
+}
+if (mm < 10) {
+  mm = '0' + mm;
+}
+today = mm + dd + yyyy;
 export default class PlayQuiz extends Component {
   constructor(props) {
     super(props);
@@ -25,29 +37,89 @@ export default class PlayQuiz extends Component {
       options: '',
       correctoption: '',
       loading: true,
-      jsonData: {},
+      jsonData: null,
       countCheck: 0,
-      jdata: '',
+      jdata: null,
+      scoreData: '',
       qno: 0,
       score: 0,
+      duration: 0,
       appState: AppState.currentState,
-      minimizeCount: 0
+      minimizeCount: 0,
+      alreadyTaken: false,
+      quizNo: 1,
+      activeQuiz: true
     }
 
   }
   componentDidMount() {
+    const { currentUser } = firebase.auth();
     AppState.addEventListener('change', this._handleAppStateChange);
-    firebase.database().ref(`quiz/${this.props.class}`)
+    firebase.database().ref('quiz')
       .once("value")
       .then(snap => {
-        const jsonDta = Object.values(snap.val());
-        this.setState({ jsonData: jsonDta })
+        const Exist = snap.child(this.props.class).exists();
+        if (Exist) {
+          firebase.database().ref(`quiz/${this.props.class}`)
+            .once("value")
+            .then(snaps => {
+              const jsonDta = Object.values(snaps.val());
+              this.setState({ jsonData: jsonDta, quizNo: snaps.val().countQuiz }, () => {
+                firebase.database().ref(`quiz/${this.props.class}`)
+                  .once("value")
+                  .then(snapshot => {
+                    const activeQuiz = snapshot.child('quiz').exists();
+                    if (activeQuiz) {
+                      const quiz = "quiz" + this.state.quizNo;
+                      firebase.database().ref(`quiz/${this.props.class}/marks/${quiz}`)
+                        .once("value")
+                        .then(snap => {
+                          const jsonDta = Object.values(snap.val());
+                          this.setState({ scoreData: jsonDta }, () => {
+                            const { scoreData } = this.state;
+                            console.log(scoreData);
+                            let flag = 0;
+                            for (i = 0; i < scoreData.length; i++) {
+                              console.log(scoreData[i]);
+                              if (scoreData[i].userId === currentUser.uid) {
+                                console.log("Found")
+                                flag = 1;
+                                break;
+                              }
+                            }
+                            if (flag === 1) {
+                              this.setState({ alreadyTaken: true }, () => this.props.quizFinish(200))
+                            }
+                          })
+                        });
+                    } else {
+                      this.setState({ activeQuiz: false }, () => this.props.quizFinish(404))
+                    }
+                  })
+              })
+            })
+        } else {
+          this.setState({ activeQuiz: false })
+        }
       })
     setInterval(() => {
       const _this = this;
-      const jdata = this.state.jsonData[0].quiz1;
-      this.setState({ loading: false, jdata: jdata });
-    }, 6000);
+      let jdata, duration;
+      if(this.state.activeQuiz) {
+        if (this.state.jsonData.length === 3) {
+          duration = this.state.jsonData[2].duration;
+          jdata = this.state.jsonData[2].quiz1;
+        }
+        else {
+          duration = this.state.jsonData[1].duration;
+          jdata = this.state.jsonData[1].quiz1;
+        }
+        duration = duration * 60;
+        this.setState({ loading: false, jdata: jdata, duration: duration });
+      } else {
+        this.setState({ loading: false},()=>this.props.quizFinish(404))
+      }
+    }, 4000);
     BackHandler.addEventListener('hardwareBackPress', this.handleBackButton);
   }
   componentWillUnmount() {
@@ -56,15 +128,17 @@ export default class PlayQuiz extends Component {
   }
   _handleAppStateChange = (nextAppState) => {
     if (this.state.appState.match(/inactive|background/) && nextAppState === 'active') {
-      alert('Dont Minimize again');
-      this.setState({ minimizeCount: this.state.minimizeCount + 1 },() => {
-        console.log(this.state.minimizeCount);
-        if(this.state.minimizeCount === 2) {
-          this.setState({ qno:  this.state.jdata.length })
+      if(this.state.minimizeCount === 0)
+      alert('Minimize again, and QUIZ STOPS');
+      else if(this.state.minimizeCount === 1)
+      alert('QUIZ AUTO SUBMIT');
+      this.setState({ minimizeCount: this.state.minimizeCount + 1 }, () => {
+        if (this.state.minimizeCount === 2) {
+          this.props.quizFinish(this.state.score);
         }
       })
     }
-    this.setState({appState: nextAppState});
+    this.setState({ appState: nextAppState });
   }
   handleBackButton() {
     return true;
@@ -72,7 +146,6 @@ export default class PlayQuiz extends Component {
   next() {
     let marks = this.state.score;
     const { jdata, qno, question } = this.state;
-    console.log(qno);
     const ans = selectedOption;
     if (ans !== '') {
       if (ans === this.state.correctoption) {
@@ -104,12 +177,10 @@ export default class PlayQuiz extends Component {
     })
   }
   _answer = (status, ans) => {
-    console.log(status);
     if (status == true) {
       const count = this.state.countCheck + 1
       this.setState({ countCheck: count })
       if (ans == this.state.correctoption) {
-        console.log("Correct");
         this.setState({ score: this.state.score + 1 })
       }
     } else {
@@ -121,6 +192,26 @@ export default class PlayQuiz extends Component {
       }
     }
 
+  }
+  showCounter = () => {
+    if (this.state.duration !== 0) {
+      return (
+        <View>
+          <CountDown
+            until={this.state.duration}
+            size={30}
+            onFinish={() => {
+              alert('Time Up!');
+              this.props.quizFinish(this.state.score * 100 / this.state.jdata.length);
+            }}
+            digitStyle={{ backgroundColor: '#FFF' }}
+            digitTxtStyle={{ color: '#1CC625' }}
+            timeToShow={['M', 'S']}
+            timeLabels={{ m: 'MM', s: 'SS' }}
+          />
+        </View>
+      );
+    }
   }
   displayContent = () => {
     let _this = this
@@ -137,6 +228,7 @@ export default class PlayQuiz extends Component {
       <View>
         <Loader loading={this.state.loading} />
         <View style={styles.container}>
+          {this.showCounter()}
           <View style={{ flex: 1, flexDirection: 'column', justifyContent: "space-between", alignItems: 'center', }}>
 
             <View style={styles.oval} >
