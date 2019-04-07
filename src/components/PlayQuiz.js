@@ -134,7 +134,7 @@ export default class PlayQuiz extends Component {
       alert('QUIZ AUTO SUBMIT');
       this.setState({ minimizeCount: this.state.minimizeCount + 1 }, () => {
         if (this.state.minimizeCount === 2) {
-          this.props.quizFinish(this.state.score);
+          this.props.quizFinish(this.state.score * 100 / this.state.jdata.length);
         }
       })
     }

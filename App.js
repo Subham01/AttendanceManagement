@@ -1,4 +1,5 @@
-import React, {Component} from 'react';
+import React, { Component } from 'react';
+import { NetInfo } from 'react-native';
 import firebase from '@firebase/app';
 require('firebase/auth');
 import Router from './src/Router';

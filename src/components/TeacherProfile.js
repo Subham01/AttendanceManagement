@@ -6,7 +6,8 @@ import {
     Text,
     ScrollView,
     Dimensions,
-    TouchableOpacity
+    TouchableOpacity,
+    Linking,
 } from 'react-native';
 import * as firebase from 'firebase';
 import { Actions } from 'react-native-router-flux';
@@ -157,7 +158,7 @@ class TeacherProfile extends Component {
                             <Text style={styles.text}>Start Attendance</Text>
                         </TouchableOpacity>
                         <TouchableOpacity style={styles.btnLogin}
-                            onPress={() => Actions.generateExcel({class: this.state.stream_sem})}>
+                            onPress={()=>{ Linking.openURL('https://attendancemanagement-13fb7.firebaseapp.com')}}>
                             <Text style={styles.text}>Excel</Text>
                         </TouchableOpacity>
                         <TouchableOpacity style={styles.btnLogin}

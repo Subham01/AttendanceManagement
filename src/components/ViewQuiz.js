@@ -231,18 +231,23 @@ export default class ViewQuiz extends Component {
                     return (
                         <View key={quiz}>
                             <TouchableOpacity style={styles.quizbttn}
-                                onPress={() => this.setState({ selectedQuiz: index })}>
+                                onPress={() => {
+                                    if(this.state.selectedQuiz===index) 
+                                        this.setState({ selectedQuiz: -1 });
+                                    else 
+                                        this.setState({ selectedQuiz: index });  
+                                    }}>
                                 <Text style={styles.text} style={{ color: 'black' }}>
                                     {quiz}
                                 </Text>
                             </TouchableOpacity>
-                            {this.showMarksList()}
                         </View>
                     );
                 })
                 return (
                     <View>
                         {quizList}
+                        {this.showMarksList()}
                     </View>
                 );
             }
