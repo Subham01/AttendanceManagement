@@ -10,7 +10,7 @@ import StudentList from './components/StudentList';
 import AttendanceList from './components/AttendanceList';
 import AllowAttendance from './components/AllowAttendance';
 import AttendanceView from './components/AttendanceView';
-import GenerateExcel from './components/GenerateExcel';
+import AttendanceGraph from './components/AttendanceGraph';
 import AddNotice from './components/AddNotice';
 import SeeNotice from './components/SeeNotice';
 import Quiz from './components/Quiz';
@@ -37,7 +37,7 @@ const RouterComponent = () => {
                     <Scene key="teacherProfile" component={TeacherProfile} hideNavBar={true} />
                     <Scene key="studentList" component={StudentList} title="Student List"/>
                     <Scene key="attendanceList" component={AttendanceList} title="Today's Attendance"/>
-                    <Scene key="generateExcel" component={GenerateExcel} title="Excel" />
+                    <Scene key="attendanceGraph" component={AttendanceGraph} title="Graph" />
                     <Scene key="addNotice" component={AddNotice} title="Notice" />
                     <Scene key="viewQuiz" component={ViewQuiz} title="Quiz" />
                 </Scene>
