@@ -15,7 +15,7 @@ import AddNotice from './components/AddNotice';
 import SeeNotice from './components/SeeNotice';
 import Quiz from './components/Quiz';
 import ViewQuiz from './components/ViewQuiz';
-
+import ManualAttendance from './components/ManualAttendance';
 const RouterComponent = () => {
     return (
         <Router>
@@ -36,6 +36,7 @@ const RouterComponent = () => {
                 <Scene key="teacher">
                     <Scene key="teacherProfile" component={TeacherProfile} hideNavBar={true} />
                     <Scene key="studentList" component={StudentList} title="Student List"/>
+                    <Scene key="manualAttendance" component={ManualAttendance} title="Manual Attendance"/>
                     <Scene key="attendanceList" component={AttendanceList} title="Today's Attendance"/>
                     <Scene key="attendanceGraph" component={AttendanceGraph} title="Graph" />
                     <Scene key="addNotice" component={AddNotice} title="Notice" />

@@ -5,13 +5,13 @@ import {
     Image,
     Dimensions,
     ScrollView,
-    Button,
     TouchableOpacity,
 } from 'react-native';
+import { Actions } from 'react-native-router-flux';
 import Icon from 'react-native-vector-icons/Ionicons';
 import * as firebase from 'firebase';
 
-const { width: WIDTH } = Dimensions.get('window');
+const { height, width: WIDTH } = Dimensions.get('window');
 var today = new Date();
 var dd = today.getDate();
 var mm = today.getMonth() + 1;
@@ -83,26 +83,40 @@ export default class AttendanceList extends Component {
     renderButton = () => {
         if (this.state.flag) {
             return (
-                <TouchableOpacity style={styles.btnLogin}
-                    onPress={this.stopAttendance.bind(this)}>
-                    <Text style={styles.text}>Stop Attendance</Text>
-                </TouchableOpacity>
+                <View>
+                    <TouchableOpacity style={styles.btnLogin}
+                        onPress={this.stopAttendance.bind(this)}>
+                        <Text style={styles.text}>Stop Attendance</Text>
+                    </TouchableOpacity>
+                    <TouchableOpacity style={styles.btnLogin}
+                        onPress={() => Actions.manualAttendance({class: this.state.stream_sem})}>
+                        <Text style={styles.text}>Manual Attendance</Text>
+                    </TouchableOpacity>
+                </View>
             );
         }
         else {
             return (
-                <TouchableOpacity style={styles.btnLogin}
-                    onPress={this.startAttendance.bind(this)}>
-                    <Text style={styles.text}>Start Attendance</Text>
-                </TouchableOpacity>
+                <View>
+                    <TouchableOpacity style={styles.btnLogin}
+                        onPress={this.startAttendance.bind(this)}>
+                        <Text style={styles.text}>Start Attendance</Text>
+                    </TouchableOpacity>
+                    <TouchableOpacity style={styles.btnLogin}
+                        onPress={() => Actions.manualAttendance({class: this.state.stream_sem})}>
+                        <Text style={styles.text}>Manual Attendance</Text>
+                    </TouchableOpacity>
+                </View>
             );
         }
     }
     render() {
         return (
             <View style={{ alignItems: 'center', flex: 1 }}>
-                <ScrollView>
+                <View style={{height: 120}}>
                     {this.renderButton()}
+                </View>
+                <ScrollView style={{height: height-200, width: WIDTH}}>
                     {this.display()}
                     {
                         this.state.students.map(student => {
