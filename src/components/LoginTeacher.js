@@ -20,9 +20,6 @@ import Loader from './Loader';
 const { width: WIDTH } = Dimensions.get('window');
 console.disableYellowBox = true;
 
-const url =
-  'https://firebasestorage.googleapis.com/v0/b/blobtest-36ff6.appspot.com/o/Obsidian.jar?alt=media&token=93154b97-8bd9-46e3-a51f-67be47a4628a';
-
  export default class LoginTeacher extends Component {
     state = {
         firstname: '',
@@ -37,11 +34,15 @@ const url =
     updateDatabase() {
         const { firstname, lastname, contact, teacherId, semester, stream } = this.state;
         const stream_sem = stream.concat(semester);
-        const { currentUser } = firebase.auth();
-        firebase.database().ref(`/teacher/${currentUser.uid}`)
-        .set({ firstname, lastname, contact, teacherId, semester, stream, stream_sem })
-        .then(()=>Actions.teacher(),() => Actions.teacherProfile())
-        .catch(this.onLoginFail.bind(this));
+        if(firstname && lastname && contact && teacherId && semester && stream){
+            const { currentUser } = firebase.auth();
+            firebase.database().ref(`/teacher/${currentUser.uid}`)
+            .set({ firstname, lastname, contact, teacherId, semester, stream, stream_sem })
+            .then(()=>Actions.teacher(),() => Actions.teacherProfile())
+            .catch(this.onLoginFail.bind(this));
+        } else {
+            this.setState({ error : 'Feild empty' })
+        }
     }
     onLoginFail() {
         this.setState({ 

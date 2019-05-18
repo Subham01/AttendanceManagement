@@ -47,29 +47,42 @@ export default class StudentList extends Component {
                 this.setState({ students: studentList });
             });
     }
+    renderContent = () => {
+        if(this.state.students.length>0) {
+            return (
+                this.state.students.map(student => {
+                    return(
+                        <View key={student.key} style={styles.backgroundContainer}>
+                            <View>
+                                <Image source={{uri: student.image}} style={styles.imageStyle} />
+                            </View>
+                            <View style={{paddingLeft: 10}}>
+                                <Text style={styles.nameStyle}>
+                                    {student.name}
+                                </Text>
+                                <Text style={styles.RollStyle}>
+                                    {student.roll}
+                                </Text>
+                                
+                            </View>
+                        </View>
+                    );
+                })
+            );
+        } else {
+            return (
+                <View style={{alignItems: 'center'}}>
+                    <Text style={{ fontSize: 30, fontWeight: 'bold', }}>No Student</Text>
+                </View>
+            );
+        }
+    }
     render() {
         return (
             <ScrollView>
                 {this.display()}
                 {
-                    this.state.students.map(student => {
-                        return(
-                            <View key={student.key} style={styles.backgroundContainer}>
-                                <View>
-                                    <Image source={{uri: student.image}} style={styles.imageStyle} />
-                                </View>
-                                <View style={{paddingLeft: 10}}>
-                                    <Text style={styles.nameStyle}>
-                                        {student.name}
-                                    </Text>
-                                    <Text style={styles.RollStyle}>
-                                        {student.roll}
-                                    </Text>
-                                    
-                                </View>
-                            </View>
-                        );
-                    })
+                   this.renderContent() 
                 }
             </ScrollView >
         );

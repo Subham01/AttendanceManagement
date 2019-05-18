@@ -5,10 +5,11 @@ import {
     View,
     TextInput,
     Dimensions,
+    KeyboardAvoidingView,
     FlatList
 } from 'react-native';
 import Modal from 'react-native-modalbox';
-import { Container, Header, Content, List, ListItem, SwipeRow, Left, Body, Right, Button, Icon } from 'native-base';
+import { Container, List, SwipeRow, Button, Icon } from 'native-base';
 import * as firebase from 'firebase';
 const screen = Dimensions.get('window');
 export default class AddNotice extends Component {
@@ -18,16 +19,32 @@ export default class AddNotice extends Component {
             listViewData: [],
             title: '',
             description: '',
+            present: false,
+            key: []
         };
     }
     componentDidMount() {
         let list = [];
-        const that = this;
-        firebase.database().ref(`/notice/${this.props.class}`)
-            .on("child_added", snapshot => {
-                var newData = [...that.state.listViewData]
-                newData.push(snapshot)
-                that.setState({ listViewData: newData })
+        firebase.database().ref(`notice`)
+            .once("value", snapshot => {
+                const exist = snapshot.child(this.props.class).exists();
+                if (exist) {
+                    firebase.database().ref(`notice/${this.props.class}`)
+                        .once("value")
+                        .then(snap => {
+                            const data = Object.values(snap.val());
+                            const key = Object.keys(snap.val());
+                            for (i = 0; i < data.length; i++) {
+                                const newObj = {
+                                    description: data[i].description,
+                                    title: data[i].title,
+                                    today: data[i].today
+                                }
+                                list = [...list, newObj];
+                            }
+                            this.setState({ listViewData: list, present: true, key: key });
+                        });
+                }
             })
     }
     addNotice = () => {
@@ -43,92 +60,109 @@ export default class AddNotice extends Component {
         }
         today = mm + '-' + dd + '-' + yyyy;
         const { title, description } = this.state;
+        const newObj = { description, title, today };
+        this.setState({
+            listViewData: [...this.state.listViewData, newObj]
+        });
         firebase.database().ref(`/notice/${this.props.class}`)
             .push({ title, description, today })
-            .then(this.added.bind(this))
+            .then(res => {
+                this.setState({
+                    key: [...this.state.key, res.getKey()],
+                    title: '',
+                    description: ''
+                }, () => this.refs.addNotice.close());
+            })
     }
-    added = () => {
+    async removeItem(index) {
+        const ID = this.state.key[index], indx = index;
+        await firebase.database().ref(`/notice/${this.props.class}/${ID}`).set(null);
         this.setState({
-            title: '',
-            description: ''
-        })
-        this.refs.addNotice.close();
+            listViewData: this.state.listViewData.filter(function (data, index) {
+                return index !== indx
+            }),
+            key: this.state.key.filter(function (data, index) {
+                return index !== indx;
+            })
+        });
     }
-    async removeItem(item) {
-        await firebase.database().ref(`/notice/${this.props.class}/${item.key}`).set(null);
-        this.setState({listViewData: this.state.listViewData.filter(function(data) { 
-            return data.key !== item.key 
-        })});
+    renderContent = () => {
+        if (this.state.present) {
+            if (this.state.listViewData.length > 0) {
+                console.log(this.state.listViewData);
+                return (
+                    <Container>
+                        <List>
+                            <FlatList
+                                data={this.state.listViewData}
+                                renderItem={({ item, index }) =>
+                                    <SwipeRow
+                                        rightOpenValue={-75}
+                                        body={
+                                            <View>
+                                                <Text style={{ fontSize: 17, fontWeight: 'bold', }}>{item.title}</Text>
+                                                <Text>{item.today}</Text>
+                                                <Text>{item.description}</Text>
+                                            </View>
+                                        }
+                                        right={
+                                            <Button danger onPress={() => this.removeItem(index)}>
+                                                <Icon active name="trash" />
+                                            </Button>
+                                        }
+                                    />
+                                }
+                            />
+                        </List>
+                    </Container>
+                );
+            } else {
+                return (
+                    <View style={{ alignItems: 'center' }}>
+                        <Text style={{ fontSize: 30, fontWeight: 'bold', }}>No Notice</Text>
+                    </View>
+                );
+            }
+        }
     }
     render() {
         return (
             <View style={{ flex: 1 }}>
-                <Container>
-                    <List>
-                        <FlatList
-                            data={this.state.listViewData}
-                            renderItem={({ item }) =>
-                                <SwipeRow
-                                    rightOpenValue={-75}
-                                    body={
-                                            <View>
-                                                <Text style={{ fontSize: 17, fontWeight: 'bold', }}>{item.val().title}</Text>
-                                                <Text>{item.val().today}</Text>
-                                                <Text>{item.val().description}</Text>
-                                            </View>
-                                    }
-                                    right={
-                                        <Button danger onPress={() => this.removeItem(item)}>
-                                            <Icon active name="trash" />
-                                        </Button>
-                                    }
-                                />
-                                    //<ListItem avatar>
-                                     //   <Body>
-                                       //     <Text style={{fontSize: 15,fontWeight: '200', }}>{item.val().title}</Text>
-                                     //       <Text>{item.val().description}</Text>
-                                       // </Body>
-                                      //  <Right>
-                                      //      <Text note>{item.val().today}</Text>
-                                     //   </Right>
-                                   // </ListItem>
-                            }
-                        />
-                    </List>
-                </Container>
-
+                {this.renderContent()}
                 < TouchableOpacity style={styles.addButton} onPress={() => this.refs.addNotice.open()}>
                     <Text style={styles.addButtonText}>+</Text>
                 </TouchableOpacity>
                 <Modal ref={"addNotice"}
-                    style={styles.modal} position={"center"}>
-                    <View>
-                        <Text style={styles.title}>New Notice</Text>
-                        <TextInput
-                            style={styles.userInput}
-                            value={this.state.title}
-                            onChangeText={title => this.setState({ title })}
-                            placeholder={'Title'}
-                            placeholderTextColor="#000"
-                        />
-                        <TextInput
-                            style={styles.userInput}
-                            value={this.state.description}
-                            onChangeText={description => this.setState({ description })}
-                            placeholder={'Description'}
-                            placeholderTextColor="#000"
-                        />
-                        <View style={{ flexDirection: 'row' }}>
-                            <TouchableOpacity style={styles.btnLogin}
-                                onPress={this.addNotice.bind(this)}>
-                                <Text style={styles.text}>Add</Text>
-                            </TouchableOpacity>
-                            <TouchableOpacity style={styles.btnLogin}
-                                onPress={() => { this.setState({ title: '', description: '' }) }}>
-                                <Text style={styles.text}>Clear</Text>
-                            </TouchableOpacity>
+                    style={styles.modal} position={"top"}>
+                    <KeyboardAvoidingView style={{ alignItems: 'center' }} behavior="height">
+                        <View>
+                            <Text style={styles.title}>New Notice</Text>
+                            <TextInput
+                                style={styles.userInput}
+                                value={this.state.title}
+                                onChangeText={title => this.setState({ title })}
+                                placeholder={'Title'}
+                                placeholderTextColor="#000"
+                            />
+                            <TextInput
+                                style={styles.userInput}
+                                value={this.state.description}
+                                onChangeText={description => this.setState({ description })}
+                                placeholder={'Description'}
+                                placeholderTextColor="#000"
+                            />
+                            <View style={{ flexDirection: 'row' }}>
+                                <TouchableOpacity style={styles.btnLogin}
+                                    onPress={this.addNotice.bind(this)}>
+                                    <Text style={styles.text}>Add</Text>
+                                </TouchableOpacity>
+                                <TouchableOpacity style={styles.btnLogin}
+                                    onPress={() => { this.setState({ title: '', description: '' }) }}>
+                                    <Text style={styles.text}>Clear</Text>
+                                </TouchableOpacity>
+                            </View>
                         </View>
-                    </View>
+                    </KeyboardAvoidingView>
                 </Modal>
             </View>
         );

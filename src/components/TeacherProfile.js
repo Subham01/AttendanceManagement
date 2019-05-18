@@ -81,21 +81,6 @@ class TeacherProfile extends Component {
                     Actions.attendanceList();
                 }
             });
-        // const dbRef = firebase.database().ref(`/attendance/${stream_sem}/${today}`);
-        // dbRef.once("value")
-        //     .then(snap => {
-        //         this.setState({ ifexists: snap.child("flag").exists() }, () => {
-        //             console.log("If Exist = "+this.state.ifexists);
-        //             if (this.setState.ifexists) {
-        //                 firebase.database().ref(`/attendance/${stream_sem}/${today}`)
-        //                     .set({ flag })
-        //                     .then(() => Actions.attendanceList());
-        //             }
-        //             else {
-        //                 Actions.attendanceList();
-        //             }
-        //         })
-        //     })
     }
     signOut() {
         firebase.auth().signOut();
@@ -108,44 +93,15 @@ class TeacherProfile extends Component {
             <ScrollView>
                 <View style={styles.backgroundContainer}>
                     <Loader loading={this.state.loading} />
-                    <View style={styles.displayContent}>
-                        <Text style={styles.titleContent}>
-                            Name :
-                    </Text>
-                        <Text style={styles.valueContent}>
+                    <View style={{ borderBottomWidth: 1, width: WIDTH, alignItems: 'center' }}>
+                        <Text style={styles.displayContent}>
                             {firstname.concat(' ').concat(lastname)}
                         </Text>
-                    </View>
-                    <View style={styles.displayContent}>
-                        <Text style={styles.titleContent}>
-                            Employee No. :
-                    </Text>
                         <Text style={styles.valueContent}>
-                            {teacherId}
+                            ID: {teacherId}
                         </Text>
-                    </View>
-                    <View style={styles.displayContent}>
-                        <Text style={styles.titleContent}>
-                            Contact :
-                    </Text>
                         <Text style={styles.valueContent}>
-                            {contact}
-                        </Text>
-                    </View>
-                    <View style={styles.displayContent}>
-                        <Text style={styles.titleContent}>
-                            Department :
-                    </Text>
-                        <Text style={styles.valueContent}>
-                            {stream}
-                        </Text>
-                    </View>
-                    <View style={styles.displayContent}>
-                        <Text style={styles.titleContent}>
-                            Semester :
-                    </Text>
-                        <Text style={styles.valueContent}>
-                            {semester}
+                            Stream: {stream} Semester: {semester}
                         </Text>
                     </View>
                     <View style={{ alignItems: 'center' }}>
@@ -158,19 +114,19 @@ class TeacherProfile extends Component {
                             <Text style={styles.text}>Start Attendance</Text>
                         </TouchableOpacity>
                         <TouchableOpacity style={styles.btnLogin}
-                            onPress={()=>{ Linking.openURL('https://attendancemanagement-13fb7.firebaseapp.com')}}>
+                            onPress={() => { Linking.openURL('https://attendancemanagement-13fb7.firebaseapp.com') }}>
                             <Text style={styles.text}>Excel</Text>
                         </TouchableOpacity>
                         <TouchableOpacity style={styles.btnLogin}
-                            onPress={() => Actions.attendanceGraph({class: this.state.stream_sem})}>
+                            onPress={() => Actions.attendanceGraph({ class: this.state.stream_sem })}>
                             <Text style={styles.text}>Attendance Overview</Text>
                         </TouchableOpacity>
                         <TouchableOpacity style={styles.btnLogin}
-                            onPress={() => Actions.viewQuiz({class: this.state.stream_sem})}>
+                            onPress={() => Actions.viewQuiz({ class: this.state.stream_sem })}>
                             <Text style={styles.text}>Quiz</Text>
                         </TouchableOpacity>
                         <TouchableOpacity style={styles.btnLogin}
-                            onPress={() => Actions.addNotice({class: this.state.stream_sem})}>
+                            onPress={() => Actions.addNotice({ class: this.state.stream_sem })}>
                             <Text style={styles.text}>Send Notice</Text>
                         </TouchableOpacity>
                         <TouchableOpacity style={styles.btnLogin}
@@ -212,7 +168,8 @@ const styles = StyleSheet.create({
     },
     displayContent: {
         paddingLeft: 16,
-        paddingBottom: 16,
+        fontSize: 25,
+        paddingBottom: 5,
         flexDirection: 'row',
     },
     titleContent: {
@@ -227,7 +184,7 @@ const styles = StyleSheet.create({
     valueContent: {
         color: 'black',
         flex: 1,
-        fontSize: 15,
+        fontSize: 20,
         fontWeight: '200',
         marginTop: 10,
         opacity: 0.5,

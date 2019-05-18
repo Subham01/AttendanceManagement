@@ -155,7 +155,7 @@ const styles = StyleSheet.create({
     width: scoreCircleSize,
     height: scoreCircleSize,
     borderRadius: scoreCircleSize / 2,
-    backgroundColor: "green"
+    backgroundColor: "#432577"
   },
   innerContainer: {
     flex: 1,
@@ -169,7 +169,7 @@ const styles = StyleSheet.create({
     backgroundColor: '#F5FCFF',
   },
   toolbar: {
-    backgroundColor: '#81c04d',
+    backgroundColor: '#432577',
     paddingTop: 30,
     paddingBottom: 10,
     flexDirection: 'row'

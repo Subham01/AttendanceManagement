@@ -1,5 +1,5 @@
 import React from 'react';
-import { Scene, Router, Actions } from 'react-native-router-flux';
+import { Scene, Router, ActionConst } from 'react-native-router-flux';
 import Login from './components/Login';
 import NewUserDetail from './components/NewUserDetail';
 import SignUp from './components/SignUp';
@@ -26,14 +26,14 @@ const RouterComponent = () => {
                     <Scene key="newUser" component={NewUserDetail} title="Step 2" />
                     <Scene key="newTeacher" component={LoginTeacher} title="Step 2" />
                 </Scene>
-                <Scene key="main">
+                <Scene key="main" type={ActionConst.RESET}>
                     <Scene key="studentProfile" component={Profile} hideNavBar={true} />
                     <Scene key="allowAttendance" component={AllowAttendance} title="Attendance"/>
                     <Scene key="attendanceView" component={AttendanceView} title="Attendance Log" />
                     <Scene key="seeNotice" component={SeeNotice} title="Notice" />
                     <Scene key="quiz" component={Quiz} title="Quiz" hideNavBar={true}/>
                 </Scene>
-                <Scene key="teacher">
+                <Scene key="teacher" type={ActionConst.RESET}>
                     <Scene key="teacherProfile" component={TeacherProfile} hideNavBar={true} />
                     <Scene key="studentList" component={StudentList} title="Student List"/>
                     <Scene key="manualAttendance" component={ManualAttendance} title="Manual Attendance"/>

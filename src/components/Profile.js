@@ -5,7 +5,7 @@ import {
     Text,
     StyleSheet,
     Dimensions,
-    TouchableOpacity
+    TouchableOpacity,
 } from 'react-native';
 import * as firebase from 'firebase';
 import Icon from 'react-native-vector-icons/Ionicons';

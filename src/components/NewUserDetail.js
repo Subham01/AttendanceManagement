@@ -35,15 +35,20 @@ const url =
         error: '',
         image: null,
         loading: false,
+        message: '',
     };
     updateDatabase() {
         const { firstname, lastname, contact, uroll, semester, stream, image } = this.state;
         const stream_sem = stream.concat(semester);
-        const { currentUser } = firebase.auth();
-        firebase.database().ref(`/users/${currentUser.uid}`)
-        .set({ firstname, lastname, contact, uroll, semester, stream, stream_sem, image })
-        .then(()=>Actions.main(),() => Actions.profile())
-        .catch(this.onLoginFail.bind(this));
+        if(firstname && lastname && contact && uroll && semester && stream && image) {
+            const { currentUser } = firebase.auth();
+            firebase.database().ref(`/users/${currentUser.uid}`)
+            .set({ firstname, lastname, contact, uroll, semester, stream, stream_sem, image })
+            .then(()=>Actions.main(),() => Actions.profile())
+            .catch(this.onLoginFail.bind(this));
+        } else {
+            this.setState({ message: 'Feild Empty' })
+        }
     }
     async componentDidMount() {
         await Permissions.askAsync(Permissions.CAMERA_ROLL);
@@ -173,6 +178,7 @@ const url =
                         {this.renderSignUpButton()}
                         <StatusBar barStyle="default" />
                     </View>
+                    <Text style={styles.errorTextStyle}>{this.state.message}</Text>
                 </View>
              </ScrollView>
          );
@@ -316,6 +322,11 @@ async function uploadImageAsync(uri) {
         position: 'absolute',
         top: 8,
         left: 37
+    },
+    errorTextStyle: {
+        fontSize: 20,
+        alignSelf: 'center',
+        color: 'red'
     },
     showPassword: {
         position: 'absolute',

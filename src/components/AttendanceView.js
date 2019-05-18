@@ -57,7 +57,7 @@ class AttendanceView extends Component {
                     }
                     //this.setState({presentDay: present, absentDay: absent}, () => this.anotherFunc())
                 })
-                setInterval(() => {resolve()},6000);
+                setInterval(() => {resolve()},4000);
         });
         promices.then(() =>{
             this.anotherFunc();

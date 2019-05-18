@@ -180,7 +180,7 @@ class AllowAttendance extends Component {
         else {
             return (
                 <Text style={styles.messageContainer}>
-                    Teacher Not Started Attendance
+                    Attendance Not Started
                 </Text>
             );
         }
@@ -319,6 +319,7 @@ const styles = {
         color: 'white'
     },
     messageContainer: {
+        alignItems: 'center',
         color: 'black',
         fontSize: 30,
         fontWeight: '200',

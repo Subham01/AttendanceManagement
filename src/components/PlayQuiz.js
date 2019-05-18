@@ -77,12 +77,9 @@ export default class PlayQuiz extends Component {
                           const jsonDta = Object.values(snap.val());
                           this.setState({ scoreData: jsonDta }, () => {
                             const { scoreData } = this.state;
-                            console.log(scoreData);
                             let flag = 0;
                             for (i = 0; i < scoreData.length; i++) {
-                              console.log(scoreData[i]);
                               if (scoreData[i].userId === currentUser.uid) {
-                                console.log("Found")
                                 flag = 1;
                                 break;
                               }
@@ -187,7 +184,6 @@ export default class PlayQuiz extends Component {
       const count = this.state.countCheck - 1
       this.setState({ countCheck: count })
       if (this.state.countCheck < 1 || ans == this.state.correctoption) {
-        console.log("Wrong");
         this.setState({ score: this.state.score - 1 })
       }
     }
@@ -267,7 +263,7 @@ const styles = StyleSheet.create({
   oval: {
     width: width * 90 / 100,
     borderRadius: 20,
-    backgroundColor: 'green'
+    backgroundColor: '#432577'
   },
   container: {
     flex: 1,

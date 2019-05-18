@@ -1,14 +1,11 @@
 import React, { Component } from 'react';
 import {
     Text,
-    TouchableOpacity,
     View,
-    TextInput,
     Dimensions,
     FlatList
 } from 'react-native';
-import Modal from 'react-native-modalbox';
-import { Container, Header, Content, List, ListItem, SwipeRow, Left, Body, Right, Button, Icon } from 'native-base';
+import { Container, List, SwipeRow } from 'native-base';
 import * as firebase from 'firebase';
 const screen = Dimensions.get('window');
 export default class AddNotice extends Component {
@@ -16,46 +13,69 @@ export default class AddNotice extends Component {
         super(props);
         this.state = {
             listViewData: [],
+            present: false,
         };
     }
     componentDidMount() {
         let list = [];
-        firebase.database().ref(`/notice/${this.props.class}`)
+        firebase.database().ref(`notice`)
             .once("value", snapshot => {
-                const data = Object.values(snapshot.val());
-                for(i=0;i<data.length;i++){
-                    const newObj = {
-                        description: data[i].description,
-                        title: data[i].title,
-                        today: data[i].today
-                    }
-                    list = [...list, newObj];
+                const exist = snapshot.child(this.props.class).exists();
+                if (exist) {
+                    firebase.database().ref(`notice/${this.props.class}`)
+                        .once("value")
+                        .then(snap => {
+                            const data = Object.values(snap.val());
+                            for (i = 0; i < data.length; i++) {
+                                const newObj = {
+                                    description: data[i].description,
+                                    title: data[i].title,
+                                    today: data[i].today
+                                }
+                                list = [...list, newObj];
+                            }
+                            this.setState({ listViewData: list, present: true });
+                        });
                 }
-                this.setState({listViewData: list});
             })
     }
-    render() {
-        return (
-            <View style={{ flex: 1 }}>
-                <Container>
-                    <List>
-                        <FlatList
-                            data={this.state.listViewData}
-                            renderItem={({ item }) =>
-                                <SwipeRow
-                                    body={
+    renderContent = () => {
+        if(this.state.present) {
+            if (this.state.listViewData.length > 0) {
+                return (
+                    <Container>
+                        <List>
+                            <FlatList
+                                data={this.state.listViewData}
+                                renderItem={({ item }) =>
+                                    <SwipeRow
+                                        body={
                                             <View>
                                                 <Text style={{ fontSize: 17, fontWeight: 'bold', }}>{item.title}</Text>
                                                 <Text>{item.today}</Text>
                                                 <Text>{item.description}</Text>
                                             </View>
-                                    }
-                                    
-                                />
-                            }
-                        />
-                    </List>
-                </Container>
+                                        }
+    
+                                    />
+                                }
+                            />
+                        </List>
+                    </Container>
+                );
+            } else {
+                return (
+                    <View style={{ alignItems: 'center' }}>
+                        <Text style={{ fontSize: 30, fontWeight: 'bold', }}>No Notice</Text>
+                    </View>
+                );
+            }
+        }
+    }
+    render() {
+        return (
+            <View style={{ flex: 1 }}>
+                {this.renderContent()}
             </View>
         );
     }
