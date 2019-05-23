@@ -6,6 +6,7 @@ import {
     Text,
     ScrollView,
     Dimensions,
+    AsyncStorage,
     TouchableOpacity,
     Linking,
 } from 'react-native';
@@ -82,11 +83,21 @@ class TeacherProfile extends Component {
                 }
             });
     }
-    signOut() {
+    removeLoginDetails = async () => {
+        try {
+            await AsyncStorage.removeItem('userId');
+            await AsyncStorage.removeItem('password');
+            await AsyncStorage.removeItem('studentLogin');
+        } catch (error) {
+            console.log(error.message);
+        }
+    }
+    signOut = () => {
+        this.removeLoginDetails();
         firebase.auth().signOut();
         Actions.auth();
         Actions.login();
-    }
+    };
     render() {
         const { firstname, lastname, contact, teacherId, semester, stream } = this.state;
         return (

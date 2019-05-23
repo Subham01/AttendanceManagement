@@ -50,6 +50,7 @@ export default class Quiz extends Component {
       })
   }
   _quizFinish(score) {
+    score = Math.round( score * 10 ) / 10;
     this.setState({ quizFinish: true, score: score })
   }
   _scoreMessage(score) {

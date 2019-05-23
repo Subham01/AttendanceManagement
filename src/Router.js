@@ -20,7 +20,7 @@ const RouterComponent = () => {
     return (
         <Router>
             <Scene key="root" hideNavBar={true}>
-                <Scene key="auth">
+                <Scene key="auth" type={ActionConst.RESET}>
                     <Scene key="login" component={Login} hideNavBar={true} />
                     <Scene key="signUp" component={SignUp} title="Step 1" />
                     <Scene key="newUser" component={NewUserDetail} title="Step 2" />

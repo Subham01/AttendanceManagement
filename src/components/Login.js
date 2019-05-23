@@ -4,6 +4,9 @@ import {
     Text,
     View,
     Image,
+    BackHandler,
+    AsyncStorage,
+    Alert,
     ImageBackground,
     Dimensions,
     TextInput,
@@ -24,11 +27,51 @@ export default class Login extends Component {
         correctLogin: null,
         password: '',
         error: '',
+        studentLogin: false,
         loading: false,
         hidePassword: true,
         loading: false
     };
-
+    checkForLogin = async () => {
+        let email = '', password = '', student = '';
+        try {
+            email = await AsyncStorage.getItem('userId') || 'none';
+            password = await AsyncStorage.getItem('password') || 'none';
+            if (email !== 'none') {
+                if (email[0] === '1') {
+                    this.setState({ email: email.substring(1), password }, () => {
+                        this.onStudentLoginButtonPress();
+                    })
+                } else {
+                    this.setState({ email: email.substring(1), password }, () => {
+                        this.onTeacherLoginButtonPress();
+                    })
+                }
+            } else {
+                console.log('Not Login ' + email + ' ' + password);
+            }
+        } catch (error) {
+            console.log(error.message);
+        }
+    }
+    componentWillMount() {
+        BackHandler.addEventListener('hardwareBackPress', this.backPressed);
+        this.checkForLogin();
+    }
+    componentWillUnmount() {
+        BackHandler.removeEventListener('hardwareBackPress', this.backPressed);
+    }
+    backPressed = () => {
+        Alert.alert(
+            'Exit App',
+            'Do you want to exit?',
+            [
+                { text: 'No', onPress: () => console.log('Cancel Pressed'), style: 'cancel' },
+                { text: 'Yes', onPress: () => BackHandler.exitApp() },
+            ],
+            { cancelable: false });
+        return true;
+    }
     onStudentLoginButtonPress() {
         this.setState({ loading: true });
         const { email, password } = this.state;
@@ -36,19 +79,19 @@ export default class Login extends Component {
             .then(() => {
                 const { currentUser } = firebase.auth();
                 firebase.database().ref('users').child(currentUser.uid)
-                .once("value")
-                .then(snap => {
-                    const newState = snap.child('uroll').exists() ? true : false;
-                    this.setState({ correctLogin: newState }, () => {
-                        {this.onLoginSuccess()}
-                        {
-                            if(this.state.correctLogin) {
-                                Actions.main();
-                                Actions.studentProfile();
+                    .once("value")
+                    .then(snap => {
+                        const newState = snap.child('uroll').exists() ? true : false;
+                        this.setState({ correctLogin: newState }, () => {
+                            { this.onLoginSuccess(1) }
+                            {
+                                if (this.state.correctLogin) {
+                                    Actions.main();
+                                    Actions.studentProfile();
+                                }
                             }
-                        }
+                        })
                     })
-                })
             })
             .catch(this.onLoginFail.bind(this));
     }
@@ -59,27 +102,37 @@ export default class Login extends Component {
             .then(() => {
                 const { currentUser } = firebase.auth();
                 firebase.database().ref('teacher').child(currentUser.uid)
-                .once("value")
-                .then(snap => {
-                    const newState = snap.child('teacherId').exists() ? true : false;
-                    this.setState({ correctLogin: newState }, () => {
-                        {this.onLoginSuccess()}
-                        {
-                            if(this.state.correctLogin) {
-                                Actions.teacher();
-                                Actions.teacherProfile();
+                    .once("value")
+                    .then(snap => {
+                        const newState = snap.child('teacherId').exists() ? true : false;
+                        this.setState({ correctLogin: newState }, () => {
+                            { this.onLoginSuccess(2) }
+                            {
+                                if (this.state.correctLogin) {
+                                    Actions.teacher();
+                                    Actions.teacherProfile();
+                                }
                             }
-                        }
+
+                        })
                     })
-                })
             })
             .catch(this.onLoginFail.bind(this));
     }
     onLoginFail() {
         this.setState({ email: '', password: '', error: 'Authentication Failed', loading: false });
     }
-    onLoginSuccess() {
-        if(this.state.correctLogin) {
+    saveDetails = async (email, password,choice) => {
+        try {
+            await AsyncStorage.setItem('userId', choice+email);
+            await AsyncStorage.setItem('password', password);
+        } catch (error) {
+            console.log('Error occoured to setItem! ' + email + ' ' + password);
+        }
+    }
+    onLoginSuccess(choice) {
+        if (this.state.correctLogin) {
+            this.saveDetails(this.state.email, this.state.password,choice);
             this.setState({
                 email: '',
                 password: '',
@@ -98,8 +151,8 @@ export default class Login extends Component {
     }
     renderButton() {
         return (
-            <View style={{flexDirection: 'row'}}>
-                <View style={{paddingRight: 30}}>
+            <View style={{ flexDirection: 'row' }}>
+                <View style={{ paddingRight: 30 }}>
                     <TouchableOpacity style={styles.buttontnLogin}
                         onPress={this.onStudentLoginButtonPress.bind(this)}>
                         <Text style={styles.text}>Student</Text>
@@ -217,7 +270,7 @@ const styles = StyleSheet.create({
         marginTop: 20
     },
     buttontnLogin: {
-        width: WIDTH / 2.5 ,
+        width: WIDTH / 2.5,
         height: 45,
         borderRadius: 25,
         justifyContent: 'center',
